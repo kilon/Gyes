@@ -1,5 +1,6 @@
 import bpy ,random
- 
+
+#function for randomising the material properties 
 def random_material(name):
     mat = bpy.data.materials.new(name)
     mat.diffuse_color = (random.random(),random.random(),random.random())
@@ -11,23 +12,27 @@ def random_material(name):
     mat.alpha = random.random()
     mat.ambient = random.random()
     return mat
- 
+
+#fuction for assinging the random material to an object 
 def setMaterial(ob, mat):
     me = ob.data
     me.materials.append(mat)
- 
-def run(origin):
-    # Create two materials
-    rm1 = random_material('Randome1')
+
+#this is the script's main loop 
+def main_loop(origin):
+    
+    # Create the two random materials
+    rm1 = random_material('Random1')
     rm2 = random_material('Random2')
  
-    # Create red cube
+    # Create a cube and apply on it the first random material
     bpy.ops.mesh.primitive_cube_add(location=origin)
     setMaterial(bpy.context.object, rm1)
-    # and blue sphere
+    
+    # create also a sphere and apply on it the second random material
     bpy.ops.mesh.primitive_uv_sphere_add(location=origin)
     bpy.ops.transform.translate(value=(1,0,0))
     setMaterial(bpy.context.object, rm2)
  
 if __name__ == "__main__":
-    run((0,0,0))
+    main_loop((0,0,0))
