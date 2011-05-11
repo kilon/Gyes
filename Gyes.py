@@ -32,6 +32,10 @@ class gyes_panel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     
+    @classmethod    
+    def poll(self, context):
+        if context.object and context.object.type == 'MESH':                    return len(context.object.data.materials)
+        
     def draw(self, context):
         self.layout.operator("gyes.random_material")
 
@@ -40,6 +44,7 @@ class gyes_random_material(bpy.types.Operator):
     bl_idname = "gyes.random_material"
     bl_label = "Random Material"
     label = bpy.props.StringProperty()
+    
     def execute(self, context):
         main_loop((0,0,0))
         return{'FINISHED'}
