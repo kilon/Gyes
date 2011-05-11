@@ -17,6 +17,7 @@ def random_material(name):
 def setMaterial(ob, mat):
     me = ob.data
     me.materials.append(mat)
+    
 
 #this is the script's main loop 
 def main_loop(origin):
@@ -34,5 +35,26 @@ def main_loop(origin):
     bpy.ops.transform.translate(value=(1,0,0))
     setMaterial(bpy.context.object, rm2)
  
-if __name__ == "__main__":
-    main_loop((0,0,0))
+
+   
+# this the main panel
+class gyes_panel(bpy.types.Panel):
+    bl_label = "Gyes"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "TOOLS"
+    
+    def draw(self, context):
+        self.layout.operator("gyes.random_material")
+
+#this is the random material button
+class gyes_random_material(bpy.types.Operator):
+    bl_idname = "gyes.random_material"
+    bl_label = "Random Material"
+    label = bpy.props.StringProperty()
+    def execute(self, context):
+        main_loop((0,0,0))
+        return{'FINISHED'}
+    
+#registration is necessary for the script to appear in the GUI
+bpy.utils.register_module(__name__)
+
