@@ -23,20 +23,9 @@ def setMaterial(ob, mat):
 def main_loop(origin):
     
     # Create the two random materials
-    rm1 = random_material('Random1')
-    rm2 = random_material('Random2')
- 
-    # Create a cube and apply on it the first random material
-    bpy.ops.mesh.primitive_cube_add(location=origin)
-    setMaterial(bpy.context.object, rm1)
+    rm = random_material('Random1')
+    setMaterial(bpy.context.object, rm)
     
-    # create also a sphere and apply on it the second random material
-    bpy.ops.mesh.primitive_uv_sphere_add(location=origin)
-    bpy.ops.transform.translate(value=(1,0,0))
-    setMaterial(bpy.context.object, rm2)
- 
-
-   
 # this the main panel
 class gyes_panel(bpy.types.Panel):
     bl_label = "Gyes"
@@ -57,4 +46,3 @@ class gyes_random_material(bpy.types.Operator):
     
 #registration is necessary for the script to appear in the GUI
 bpy.utils.register_module(__name__)
-
