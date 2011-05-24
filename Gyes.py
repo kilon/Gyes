@@ -7,9 +7,19 @@ def random_material(name):
     mat.diffuse_shader = random.choice(['LAMBERT','FRESNEL','TOON','MINNAERT']) 
     mat.diffuse_intensity = random.random()
     mat.specular_color = (random.random(),random.random(),random.random())
-    mat.specular_shader = 'COOKTORR'
+    mat.specular_shader = random.choice(['COOKTORR','WARDISO','TOON','BLINN','PHONG'])
     mat.specular_intensity = random.random()
-    mat.alpha = random.random()
+    mat.specular_hardness = random.randrange(1,511,1)
+    mat.use_transparency = random.randrange(0,2)
+    
+    if mat.use_transparency == 1 :
+        mat.transparency_method == random.choice(['MASK', 'Z_TRANSPARENCY', 'RAYTRACE'])
+        if mat.transparency_method == 'MASK' :
+            mat.alpha = random.random()
+        if mat.transparency_method == 'Z_TRANSPARENCY' :
+            mat.alpha = random.random()
+            mat.specular_alpha= random.random()
+      
     mat.ambient = random.random()
     return mat
 
