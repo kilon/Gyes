@@ -1,3 +1,17 @@
+bl_info = {
+    "name": "Gyes",
+    "description": "Random Material Generator",
+    "author": "Kilon",
+    "version": (0,1),
+    "blender": (2, 5, 7),
+    "api": 36147,
+    "location": "View3D > Left panel ",
+    "warning": '', # used for warning icon and text in addons panel
+    "wiki_url": "http://blenderartists.org/forum/showthread.php?218110-Gyes-%28Random-Material-Generator%29",
+    "tracker_url": "http://projects.blender.org/tracker/index.php?func=detail&aid=27470&group_id=153&atid=467",
+    "category": "Material"}
+    
+
 import bpy ,random
 
 #function for randomising the material properties 
@@ -59,5 +73,10 @@ class gyes_random_material(bpy.types.Operator):
         main_loop((0,0,0))
         return{'FINISHED'}
     
+
 #registration is necessary for the script to appear in the GUI
-bpy.utils.register_module(__name__)
+def register():
+    bpy.utils.register_module(__name__)
+    
+def unregister():
+    bpy.utils.unregister_module(__name__)
