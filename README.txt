@@ -3,7 +3,7 @@
 WHAT IS GYES ?
 ==============
 
- Gyes is a script that makes random materials. 
+ Gyes is a Blender script that makes random materials. 
 
  One of the most basic ideas of Gyes is randomisation. The idea behind radomisation is that it can become tedious to change each parameter randomly when you dont have a specific direction to the result you want to achieve, a script will always do this many hundrends times faster. Instead of doing it by hand , Gyes give you the ability to create loads of random material in a few seconds and add them to the material list, then its a question of going in your material list keeping what you want and deleting what you dont like. 
 
@@ -23,7 +23,7 @@ https://github.com/kilon/Gyes/tree/
 HOW DO I INSTALL GYES ?
 ========================
 
-After you download the compressed file, uncompress to extract Gyes.py then go to blender and install it like any other Addon. (user preferences -> Addons -> install add on -> Gyes -> enable the add on) . 
+After you download the compressed file, uncompress to extract Gyes.py then go to Blender and install it like any other Addon. (user preferences -> Addons -> install add on -> Gyes -> enable the add on) . 
 
 =================
 HOW DO I USE IT ?
