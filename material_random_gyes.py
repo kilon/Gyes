@@ -15,8 +15,9 @@ bl_info = {
 import bpy ,random
 
 #function for randomising the material properties 
-def random_material(name):
-    mat = bpy.data.materials.new(name)
+def random_material(ob,name):
+    #mat = bpy.data.materials.new(name)
+    mat = ob
     mat.diffuse_color = (random.random(),random.random(),random.random())
     mat.diffuse_shader = random.choice(['LAMBERT','FRESNEL','TOON','MINNAERT']) 
     mat.diffuse_intensity = random.random()
@@ -42,16 +43,18 @@ def setMaterial(ob, mat):
     me = ob.data
     me.materials.append(mat)
     
-
 #this is the script's main loop 
 def main_loop(origin):
     
     # Create the two random materials
     for i in bpy.context.selected_objects :
         if i.type == 'MESH' :
-            rm = random_material('Random')
-            setMaterial(i, rm)
-    
+            
+            #setMaterial(i, i.active_material)
+            
+            rm = random_material(i.active_material,'Random')
+            
+           
 # this the main panel
 class gyes_panel(bpy.types.Panel):
     bl_label = "Gyes"
