@@ -47,8 +47,10 @@ def setMaterial(ob, mat):
 def main_loop(origin):
     
     # Create the two random materials
-    rm = random_material('Random1')
-    setMaterial(bpy.context.object, rm)
+    for i in bpy.context.selected_objects :
+        if i.type == 'MESH' :
+            rm = random_material('Random')
+            setMaterial(i, rm)
     
 # this the main panel
 class gyes_panel(bpy.types.Panel):
