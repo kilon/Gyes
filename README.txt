@@ -37,6 +37,9 @@ HOW DO I USE IT ?
 UPDATES:
 =========
 
+ * now randomises only assigned material, no need to assign the random material any more
+ * now randomisation can apply to multiple mesh objects, with each one having a unique random material
+
  25-5-2011
 
  * Gyes is now an addon and installs like any other addon. 
