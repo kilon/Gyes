@@ -1,3 +1,5 @@
+""" Copyright notice """
+
 bl_info = {
     "name": "Material_Gyes",
     "description": "Random Material Generator",
