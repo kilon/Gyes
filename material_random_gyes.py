@@ -18,32 +18,23 @@ import bpy ,random
 from bpy.props import *
 
 def scn_props():
-    bpy.types.Scene.rp = IntProperty(name="percentage", description = "percentage of randomisation" , min = 0 , max = 100)
-    bpy.context.scene["rp"] = 50
+    bpy.types.Scene.rp = IntProperty(name="percentage", description = "percentage of randomisation" , min = 0 , max = 100 , default = 50)
     
-    bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Randomise Diffuse Shader" )
-    bpy.context.scene["rdiffuse_shader"] = True
+    bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Randomise Diffuse Shader" , default = True)
     
-    bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Randomise Diffuse Color" )
-    bpy.context.scene["rdiffuse_color"] = True
+    bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Randomise Diffuse Color", default = True  )
     
-    bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Randomise Diffuse Intensity" )
-    bpy.context.scene["rdiffuse_intensity"] = True
+    bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Randomise Diffuse Intensity" , default = True )
     
-    bpy.types.Scene.rspecular_color = BoolProperty(name= "Specular Color" ,description = "Randomise Specular Color" )
-    bpy.context.scene["rspecular_color"] = True
+    bpy.types.Scene.rspecular_color = BoolProperty(name= "Specular Color" ,description = "Randomise Specular Color" , default = True)
     
-    bpy.types.Scene.rspecular_shader = BoolProperty(name= "Specular Shader" ,description = "Randomise Specular Shader" )
-    bpy.context.scene["rspecular_shader"] = True
+    bpy.types.Scene.rspecular_shader = BoolProperty(name= "Specular Shader" ,description = "Randomise Specular Shader" , default = True)
     
-    bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" )
-    bpy.context.scene["rspecular_intensity"] = True
+    bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" , default = True)
     
-    bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" )
-    bpy.context.scene["rspecular_hardness"] = True
+    bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" , default = True)
     
-    bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" )
-    bpy.context.scene["rtransparency"] = True
+    bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
     
     
 scn_props()
@@ -54,28 +45,28 @@ def random_material(ob,name):
     mat = ob
     scn = bpy.context.scene
     
-    if scn["rdiffuse_color"]==True:
+    if scn.rdiffuse_color:#scn["rdiffuse_color"]==True:
         mat.diffuse_color = (random.random(),random.random(),random.random())
     
-    if scn["rdiffuse_shader"]:
+    if scn.rdiffuse_shader:
         mat.diffuse_shader = random.choice(['LAMBERT','FRESNEL','TOON','MINNAERT'])
     
-    if scn["rdiffuse_intensity"]:
+    if scn.rdiffuse_intensity:
             mat.diffuse_intensity = random.random()  # *(0.01*scn["rp"])
     
-    if scn["rspecular_color"]:
+    if scn.rspecular_color:
         mat.specular_color = (random.random(),random.random(),random.random())
     
-    if scn["rspecular_shader"]:
+    if scn.rspecular_shader:
         mat.specular_shader = random.choice(['COOKTORR','WARDISO','TOON','BLINN','PHONG'])
     
-    if scn["rspecular_intensity"]:
+    if scn.rspecular_intensity:
         mat.specular_intensity = random.random()
     
-    if scn["rspecular_hardness"]:
+    if scn.rspecular_hardness:
         mat.specular_hardness = random.randrange(1,511,1)
     
-    mat.use_transparency = scn["rtransparency"] # random.randrange(0,2)
+    mat.use_transparency = scn.rtransparency # random.randrange(0,2)
     
     if mat.use_transparency == True :
         mat.transparency_method == random.choice(['MASK', 'Z_TRANSPARENCY', 'RAYTRACE'])
