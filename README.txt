@@ -36,9 +36,18 @@ HOW DO I USE IT ?
 =========
 UPDATES:
 =========
-
- * now randomises only assigned material, no need to assign the random material any more
+ 
+ 4-6-2011
+ * now randomises only assigned material, no need to assign the random material
  * now randomisation can apply to multiple mesh objects, with each one having a unique random material
+ * added option to randomise Diffuse Shader
+ * added option to randomise Diffuse Color
+ * added option to randomise Specular Shader
+ * added option to randomise Specular Color
+ * added option to randomise Diffuse Intensity
+ * added option to randomise Specular Intensity
+ * added option to randomise Specular Hardness
+ * added option to randomise Transparency
 
  25-5-2011
 
