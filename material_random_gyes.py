@@ -1,4 +1,4 @@
-""" Copyright notice """
+""" Copyright  Kilon 2011 GPL licence applies"""
 
 bl_info = {
     "name": "Material_Gyes",
@@ -31,12 +31,14 @@ class random_material:
         bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" , default = True)
         bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" , default = True)
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
-    
+        self.rm_history=[] 
+        
     # the fuction that randomises the material 
     def random_material(self,ob,name):
         #mat = bpy.data.materials.new(name)
         mat = ob
         scn = bpy.context.scene
+        self.rm_history.append(mat)
     
         if scn.rdiffuse_color:#scn["rdiffuse_color"]==True:
             mat.diffuse_color = (random.random(),random.random(),random.random())
@@ -71,7 +73,13 @@ class random_material:
       
         mat.ambient = random.random()
         return mat
-
+    
+    def restore_material(self,index):
+        bpy.context.object.active_material = self.rm_history[index]
+        print("selected object : "+ str(bpy.context.selected_objects[0]))
+        print(bpy.context.object.active_material.diffuse_shader)
+    
+    
 rm = random_material()
     
 #this is the script's main loop 
@@ -112,6 +120,13 @@ class gyes_panel(bpy.types.Panel):
         
         #box.prop(context.scene,"rp")
         layout.operator("gyes.random_material")
+        layout.label(text="History")
+        
+        if len(rm.rm_history) > 0:
+            history_box= layout.box()
+           
+            for i in range(0,len(rm.rm_history)):
+                history_box.operator("gyes.history_item", text = "Rand. Mat. : "+str(i)).rindex = i
 
 #this is the random material button
 class gyes_random_material(bpy.types.Operator):
@@ -123,7 +138,16 @@ class gyes_random_material(bpy.types.Operator):
         main_loop((0,0,0))
         return{'FINISHED'}
     
-
+class history_item(bpy.types.Operator):
+    rindex=IntProperty(default=0)
+    bl_label = "Rand. Mat. :" + str(rindex)
+    bl_idname = "gyes.history_item"
+    
+    def execute(self, context):
+        rm.restore_material(self.rindex)
+        print("restoring to index"+str(self.rindex))
+        return{'FINISHED'}
+    
 #registration is necessary for the script to appear in the GUI
 def register():
     bpy.utils.register_module(__name__)
