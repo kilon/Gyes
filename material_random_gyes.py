@@ -31,7 +31,9 @@ class random_material_class:
         bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" , default = True)
         bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" , default = True)
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
-        self.rm_history=[] 
+        bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0)
+        self.rm_history=[]
+        
         
     # the fuction that randomises the material 
     def random_material(self,active_material,name):
@@ -39,8 +41,11 @@ class random_material_class:
         mat = active_material
         
         scn = bpy.context.scene
-         
+        
+        bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0, min = 0,max = len(self.rm_history))
+        
         self.rm_history.append(mat)
+        scn.history_index = len(self.rm_history)
     
         if scn.rdiffuse_color:#scn["rdiffuse_color"]==True:
             mat.diffuse_color = (random.random(),random.random(),random.random())
@@ -76,17 +81,9 @@ class random_material_class:
         mat.ambient = random.random()
         return mat
     
-    def restore_material(self,index):
-        print("restoring to index"+str(index))
-        print("Index contents")
-        print("--------------")
-        
-        for i in range(0,len(self.rm_history)):
-            print("Index No ",i)
-            print("index contains : " +str(self.rm_history[i].diffuse_shader))
-        bpy.context.selected_objects[0].active_material = self.rm_history[index]
-        print("selected object : "+ str(bpy.context.selected_objects[0]))
-        print(bpy.context.object.active_material.diffuse_shader)
+    def set_material(self):
+       print("aha")
+       bpy.context.selected_objects[0].active_material=self.rm_history[bpy.context.scene.history_index]
     
     
 rm = random_material_class()
@@ -130,12 +127,9 @@ class gyes_panel(bpy.types.Panel):
         #box.prop(context.scene,"rp")
         layout.operator("gyes.random_material")
         layout.label(text="History")
-        
-        if len(rm.rm_history) > 0:
-            history_box= layout.box()
-           
-            for i in range(0,len(rm.rm_history)):
-                history_box.operator("gyes.history_item", text = "Rand. Mat. : "+str(i)).rindex = i
+        history_box= layout.box()
+        history_box.prop(context.scene, "history_index")
+        history_box.operator("gyes.activate")
 
 #this is the random material button
 class gyes_random_material(bpy.types.Operator):
@@ -148,12 +142,12 @@ class gyes_random_material(bpy.types.Operator):
         return{'FINISHED'}
     
 class history_item(bpy.types.Operator):
-    rindex=IntProperty(default=0)
-    bl_label = "Rand. Mat. :" + str(rindex)
-    bl_idname = "gyes.history_item"
+    
+    bl_label = "Activate"
+    bl_idname = "gyes.activate"
     
     def execute(self, context):
-        rm.restore_material(self.rindex)
+        rm.set_material()
         
         return{'FINISHED'}
     
