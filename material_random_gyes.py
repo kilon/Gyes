@@ -93,10 +93,10 @@ class random_material_class:
                
       
         mat.ambient = random.random()
-        self.rm_history[scn.history_index]= {"diffuse_color" : mat.diffuse_color,
+        self.rm_history[scn.history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
           "diffuse_shader" : mat.diffuse_shader , 
           "diffuse_intensity" : mat.diffuse_intensity ,
-          "specular_color" : mat.specular_color , 
+          "specular_color" : tuple(mat.specular_color) , 
           "specular_shader" : mat.specular_shader ,
           "specular_intensity" : mat.specular_intensity , 
           "specular_hardness" : mat.specular_hardness , 
