@@ -14,11 +14,11 @@ bl_info = {
     "category": "Other"}
     
 
-import bpy ,random
+import bpy ,random , copy 
 from bpy.props import *
 
 
-class random_material:
+class random_material_class:
     
     def __init__(self):
      
@@ -34,10 +34,12 @@ class random_material:
         self.rm_history=[] 
         
     # the fuction that randomises the material 
-    def random_material(self,ob,name):
+    def random_material(self,active_material,name):
         #mat = bpy.data.materials.new(name)
-        mat = ob
+        mat = active_material
+        
         scn = bpy.context.scene
+         
         self.rm_history.append(mat)
     
         if scn.rdiffuse_color:#scn["rdiffuse_color"]==True:
@@ -75,12 +77,19 @@ class random_material:
         return mat
     
     def restore_material(self,index):
-        bpy.context.object.active_material = self.rm_history[index]
+        print("restoring to index"+str(index))
+        print("Index contents")
+        print("--------------")
+        
+        for i in range(0,len(self.rm_history)):
+            print("Index No ",i)
+            print("index contains : " +str(self.rm_history[i].diffuse_shader))
+        bpy.context.selected_objects[0].active_material = self.rm_history[index]
         print("selected object : "+ str(bpy.context.selected_objects[0]))
         print(bpy.context.object.active_material.diffuse_shader)
     
     
-rm = random_material()
+rm = random_material_class()
     
 #this is the script's main loop 
 def main_loop(origin):
@@ -145,7 +154,7 @@ class history_item(bpy.types.Operator):
     
     def execute(self, context):
         rm.restore_material(self.rindex)
-        print("restoring to index"+str(self.rindex))
+        
         return{'FINISHED'}
     
 #registration is necessary for the script to appear in the GUI
