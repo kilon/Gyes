@@ -33,18 +33,9 @@ class random_material_class:
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0)
         self.rm_history={}
-        
-        
-    # the fuction that randomises the material 
-    def random_material(self,active_material,name):
-        #mat = bpy.data.materials.new(name)
-        mat = active_material
-        
+    
+    def store_to_history(self, mat):
         scn = bpy.context.scene
-        
-        bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0, min = 0,max = len(self.rm_history))
-        
-        #self.rm_history.append(mat)
         self.rm_history[scn.history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
           "diffuse_shader" : mat.diffuse_shader , 
           "diffuse_intensity" : mat.diffuse_intensity ,
@@ -56,7 +47,19 @@ class random_material_class:
           "transparency_method" : mat.transparency_method , 
           "alpha" : mat.alpha , 
           "specular_alpha" : mat.specular_alpha , 
-          "ambient" : mat.ambient }
+          "ambient" : mat.ambient }    
+        
+    # the fuction that randomises the material 
+    def random_material(self,active_material,name):
+        #mat = bpy.data.materials.new(name)
+        mat = active_material
+        self.store_to_history(mat)
+        scn = bpy.context.scene
+        
+        bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0, min = 0,max = len(self.rm_history))
+        
+        #self.rm_history.append(mat)
+        
               
         scn.history_index = len(self.rm_history)+1
     
@@ -106,18 +109,8 @@ class random_material_class:
                
       
         mat.ambient = random.random()
-        self.rm_history[scn.history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
-          "diffuse_shader" : mat.diffuse_shader , 
-          "diffuse_intensity" : mat.diffuse_intensity ,
-          "specular_color" : tuple(mat.specular_color) , 
-          "specular_shader" : mat.specular_shader ,
-          "specular_intensity" : mat.specular_intensity , 
-          "specular_hardness" : mat.specular_hardness , 
-          "use_transparency" : mat.use_transparency , 
-          "transparency_method" : mat.transparency_method , 
-          "alpha" : mat.alpha , 
-          "specular_alpha" : mat.specular_alpha , 
-          "ambient" : mat.ambient }
+        
+        self.store_to_history(mat)
           
         return mat
     
