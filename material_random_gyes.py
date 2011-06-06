@@ -45,6 +45,19 @@ class random_material_class:
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0, min = 0,max = len(self.rm_history))
         
         #self.rm_history.append(mat)
+        self.rm_history[scn.history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
+          "diffuse_shader" : mat.diffuse_shader , 
+          "diffuse_intensity" : mat.diffuse_intensity ,
+          "specular_color" : tuple(mat.specular_color) , 
+          "specular_shader" : mat.specular_shader ,
+          "specular_intensity" : mat.specular_intensity , 
+          "specular_hardness" : mat.specular_hardness , 
+          "use_transparency" : mat.use_transparency , 
+          "transparency_method" : mat.transparency_method , 
+          "alpha" : mat.alpha , 
+          "specular_alpha" : mat.specular_alpha , 
+          "ambient" : mat.ambient }
+              
         scn.history_index = len(self.rm_history)+1
     
         if scn.rdiffuse_color:#scn["rdiffuse_color"]==True:
@@ -111,21 +124,25 @@ class random_material_class:
     
     def set_material(self):
         
-        scn = bpy.context.scene
-        mat = bpy.context.selected_objects[0].active_material
+        for i in bpy.context.selected_objects :
+            if i.type == 'MESH' :
+            
+                
+                scn = bpy.context.scene
+                mat = i.active_material
         
-        mat.diffuse_color = self.rm_history[scn.history_index]["diffuse_color"]
-        mat.diffuse_shader = self.rm_history[scn.history_index]["diffuse_shader"]
-        mat.diffuse_intensity = self.rm_history[scn.history_index]["diffuse_intensity"]
-        mat.specular_color = self.rm_history[scn.history_index]["specular_color"]
-        mat.specular_shader = self.rm_history[scn.history_index]["specular_shader"]
-        mat.specular_intensity = self.rm_history[scn.history_index]["specular_intensity"]
-        mat.specular_hardness = self.rm_history[scn.history_index]["specular_hardness"]
-        mat.use_transparency = self.rm_history[scn.history_index]["use_transparency"]
-        mat.transparency_method = self.rm_history[scn.history_index]["transparency_method"]
-        mat.alpha = self.rm_history[scn.history_index]["alpha"]
-        mat.specular_alpha = self.rm_history[scn.history_index]["specular_alpha"]
-        mat.ambient = self.rm_history[scn.history_index]["ambient"]
+                mat.diffuse_color = self.rm_history[scn.history_index]["diffuse_color"]
+                mat.diffuse_shader = self.rm_history[scn.history_index]["diffuse_shader"]
+                mat.diffuse_intensity = self.rm_history[scn.history_index]["diffuse_intensity"]
+                mat.specular_color = self.rm_history[scn.history_index]["specular_color"]
+                mat.specular_shader = self.rm_history[scn.history_index]["specular_shader"]
+                mat.specular_intensity = self.rm_history[scn.history_index]["specular_intensity"]
+                mat.specular_hardness = self.rm_history[scn.history_index]["specular_hardness"]
+                mat.use_transparency = self.rm_history[scn.history_index]["use_transparency"]
+                mat.transparency_method = self.rm_history[scn.history_index]["transparency_method"]
+                mat.alpha = self.rm_history[scn.history_index]["alpha"]
+                mat.specular_alpha = self.rm_history[scn.history_index]["specular_alpha"]
+                mat.ambient = self.rm_history[scn.history_index]["ambient"]
        
     
     
