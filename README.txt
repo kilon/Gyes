@@ -36,6 +36,11 @@ HOW DO I USE IT ?
 =========
 UPDATES:
 =========
+
+ 6-6-2011
+ * now random material, are stored in history. History is in essense a sophisticated undo tool
+ * added GUI element for choosing the index in history, each random material stored in history has its own index
+ * added Activate button, once you have chosen the index of the random material, this button will assign to the selected object the selected random material as active material. 
  
  4-6-2011
  * now randomises only assigned material, no need to assign the random material
