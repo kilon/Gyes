@@ -180,6 +180,7 @@ class gyes_panel(bpy.types.Panel):
         history_box= layout.box()
         history_box.prop(context.scene, "history_index")
         history_box.operator("gyes.activate")
+        history_box.operator("gyes.store")
 
 #this is the random material button
 class gyes_random_material(bpy.types.Operator):
@@ -200,7 +201,18 @@ class history_item(bpy.types.Operator):
         rm.set_material()
         
         return{'FINISHED'}
+
+class store_to_history(bpy.types.Operator):
     
+    bl_label = "Store"
+    bl_idname = "gyes.store"
+    
+    def execute(self, context):
+        mat = bpy.context.selected_objects[0].active_material
+        rm.store_to_history(mat)
+        
+        return{'FINISHED'}
+        
 #registration is necessary for the script to appear in the GUI
 def register():
     bpy.utils.register_module(__name__)
