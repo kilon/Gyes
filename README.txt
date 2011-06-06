@@ -36,8 +36,13 @@ HOW DO I USE IT ?
 =========
 UPDATES:
 =========
+ 
+ *"Activate" button works on multiple selections
+ * Now each time you press the random button , what is stored is not just        the random material but also any change you did on random material by hand. For any index you are located not just the last one.
+ * If you dont want to create new random material and all you want is to save changes you performed on a existing one, there is a new dedicated button for this function called "Store"
 
  6-6-2011
+
  * now random material, are stored in history. History is in essense a sophisticated undo tool
  * added GUI element for choosing the index in history, each random material stored in history has its own index
  * added Activate button, once you have chosen the index of the random material, this button will assign to the selected object the selected random material as active material. 
