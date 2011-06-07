@@ -31,12 +31,14 @@ class random_material_class:
         bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" , default = True)
         bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" , default = True)
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
-        bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0)
+        bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 , )
+        bpy.context.scene.history_index=1
         self.rm_history={}
     
     def store_to_history(self, mat):
         scn = bpy.context.scene
-        self.rm_history[scn.history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
+        history_index = scn.history_index
+        self.rm_history[history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
           "diffuse_shader" : mat.diffuse_shader , 
           "diffuse_intensity" : mat.diffuse_intensity ,
           "specular_color" : tuple(mat.specular_color) , 
@@ -51,19 +53,14 @@ class random_material_class:
         
     # the fuction that randomises the material 
     def random_material(self,active_material,name):
-        #mat = bpy.data.materials.new(name)
+        
         mat = active_material
         self.store_to_history(mat)
         scn = bpy.context.scene
-        
-        bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 0, min = 0,max = len(self.rm_history))
-        
-        #self.rm_history.append(mat)
-        
-              
-        scn.history_index = len(self.rm_history)+1
-    
-        if scn.rdiffuse_color:#scn["rdiffuse_color"]==True:
+                  
+        scn.history_index =len(self.rm_history)+1
+                    
+        if scn.rdiffuse_color:
             mat.diffuse_color = (random.random(),random.random(),random.random())
             
     
@@ -179,8 +176,19 @@ class gyes_panel(bpy.types.Panel):
         layout.label(text="History")
         history_box= layout.box()
         history_box.prop(context.scene, "history_index")
-        history_box.operator("gyes.activate")
+        row = history_box.row()
+        row.operator("gyes.previous")
+        row.operator("gyes.next")
+        rm_index = bpy.context.scene.history_index
+        
+        if rm_index in rm.rm_history and rm.rm_history[rm_index] :
+            print( rm_index , " its true" )
+            history_box.operator("gyes.activate")
+        else:
+            print (rm_index , " its false")
+            history_box.label(text= "Empty Index ! ")
         history_box.operator("gyes.store")
+        
 
 #this is the random material button
 class gyes_random_material(bpy.types.Operator):
@@ -192,15 +200,46 @@ class gyes_random_material(bpy.types.Operator):
         main_loop((0,0,0))
         return{'FINISHED'}
     
-class history_item(bpy.types.Operator):
+class history_previous(bpy.types.Operator):
+    
+    bl_label = "Previous"
+    bl_idname = "gyes.previous"
+    
+    def execute(self, context):
+        if bpy.context.scene.history_index > 1 :
+            bpy.context.scene.history_index = bpy.context.scene.history_index -1
+            rm_index = bpy.context.scene.history_index
+            if rm_index in rm.rm_history and rm.rm_history[rm_index]:
+                rm.set_material()
+        
+        return{'FINISHED'}
+
+class history_next(bpy.types.Operator):
+    
+    bl_label = "Next"
+    bl_idname = "gyes.next"
+    
+    def execute(self, context):
+        if bpy.context.scene.history_index > 0 :
+            bpy.context.scene.history_index = bpy.context.scene.history_index +1
+            rm_index = bpy.context.scene.history_index
+            if rm_index in rm.rm_history and rm.rm_history[rm_index]:
+                rm.set_material()
+        
+        return{'FINISHED'}
+
+class history_activate(bpy.types.Operator):
     
     bl_label = "Activate"
     bl_idname = "gyes.activate"
     
     def execute(self, context):
-        rm.set_material()
+        rm_index = bpy.context.scene.history_index
+        if rm.rm_history[rm_index] != {}:
+            rm.set_material()
         
         return{'FINISHED'}
+
 
 class store_to_history(bpy.types.Operator):
     
