@@ -13,14 +13,16 @@ bl_info = {
     "tracker_url": "http://projects.blender.org/tracker/index.php?func=detail&aid=27470&group_id=153&atid=467",
     "category": "Other"}
     
-
+# first we import all the required modules
 import bpy ,random , copy 
 from bpy.props import *
 
 
 class random_material_class:
+    """ this class contains all fuctions and variables concerning generation of random material """
     
     def __init__(self):
+        """ several fuctions can be found here . All options for random generation . The History dictionary and several others."""
      
         bpy.types.Scene.rp = IntProperty(name="percentage", description = "percentage of randomisation" , min = 0 , max = 100 , default = 50)
         bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Randomise Diffuse Shader" , default = True)
@@ -35,6 +37,7 @@ class random_material_class:
         bpy.context.scene.history_index=1
         self.rm_history={}
     
+    #store active material to history
     def store_to_history(self, mat):
         scn = bpy.context.scene
         history_index = scn.history_index
@@ -55,11 +58,11 @@ class random_material_class:
     def random_material(self,active_material,name):
         
         mat = active_material
-        self.store_to_history(mat)
+                
         scn = bpy.context.scene
                   
         scn.history_index =len(self.rm_history)+1
-                    
+        #cheks that the user has allowed the randomisation of that specific parameter            
         if scn.rdiffuse_color:
             mat.diffuse_color = (random.random(),random.random(),random.random())
             
@@ -106,13 +109,13 @@ class random_material_class:
                
       
         mat.ambient = random.random()
-        
+        # after you finishes randomisation store the random material to history
         self.store_to_history(mat)
           
         return mat
     
-    
-    def set_material(self):
+    # Activate. Make active material the particular history index the user has chosen
+    def activate(self):
         
         for i in bpy.context.selected_objects :
             if i.type == 'MESH' :
@@ -137,16 +140,7 @@ class random_material_class:
     
     
 rm = random_material_class()
-    
-#this is the script's main loop 
-def main_loop(origin):
-    
-    # Create the two random materials
-    for i in bpy.context.selected_objects :
-        if i.type == 'MESH' :
-            
-            rm.random_material(i.active_material,'Random')
-                   
+                  
 # this the main panel
 class gyes_panel(bpy.types.Panel):
     bl_label = "Gyes"
@@ -182,12 +176,14 @@ class gyes_panel(bpy.types.Panel):
         rm_index = bpy.context.scene.history_index
         
         if rm_index in rm.rm_history and rm.rm_history[rm_index] :
-            print( rm_index , " its true" )
             history_box.operator("gyes.activate")
         else:
-            print (rm_index , " its false")
             history_box.label(text= "Empty Index ! ")
-        history_box.operator("gyes.store")
+        
+        if bpy.context.scene.history_index < len(rm.rm_history)+2:
+            history_box.operator("gyes.store")
+        else:
+            history_box.label(text= "Not the first Empty Index")
         
 
 #this is the random material button
@@ -197,9 +193,13 @@ class gyes_random_material(bpy.types.Operator):
     label = bpy.props.StringProperty()
     
     def execute(self, context):
-        main_loop((0,0,0))
+       for i in bpy.context.selected_objects :
+        if i.type == 'MESH' :
+            
+            rm.random_material(i.active_material,'Random')
         return{'FINISHED'}
     
+# Move to the previous hisory index and activate it
 class history_previous(bpy.types.Operator):
     
     bl_label = "Previous"
@@ -210,10 +210,11 @@ class history_previous(bpy.types.Operator):
             bpy.context.scene.history_index = bpy.context.scene.history_index -1
             rm_index = bpy.context.scene.history_index
             if rm_index in rm.rm_history and rm.rm_history[rm_index]:
-                rm.set_material()
+                rm.activate()
         
         return{'FINISHED'}
 
+# Move to the next hisory index and activate it
 class history_next(bpy.types.Operator):
     
     bl_label = "Next"
@@ -224,10 +225,11 @@ class history_next(bpy.types.Operator):
             bpy.context.scene.history_index = bpy.context.scene.history_index +1
             rm_index = bpy.context.scene.history_index
             if rm_index in rm.rm_history and rm.rm_history[rm_index]:
-                rm.set_material()
+                rm.activate()
         
         return{'FINISHED'}
 
+# 
 class history_activate(bpy.types.Operator):
     
     bl_label = "Activate"
@@ -236,11 +238,11 @@ class history_activate(bpy.types.Operator):
     def execute(self, context):
         rm_index = bpy.context.scene.history_index
         if rm.rm_history[rm_index] != {}:
-            rm.set_material()
+            rm.activatel()
         
         return{'FINISHED'}
 
-
+# It stores current active material to the selected history index
 class store_to_history(bpy.types.Operator):
     
     bl_label = "Store"
@@ -249,6 +251,7 @@ class store_to_history(bpy.types.Operator):
     def execute(self, context):
         mat = bpy.context.selected_objects[0].active_material
         rm.store_to_history(mat)
+         
         
         return{'FINISHED'}
         
