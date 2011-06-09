@@ -37,9 +37,15 @@ HOW DO I USE IT ?
 UPDATES:
 =========
  
+9-6-2011
+
  *"Activate" button works on multiple selections
- * Now each time you press the random button , what is stored is not just        the random material but also any change you did on random material by hand. For any index you are located not just the last one.
- * If you dont want to create new random material and all you want is to save changes you performed on a existing one, there is a new dedicated button for this function called "Store"
+ * added next and previous button to browse through history
+ * Added Store button to store random and non random edits to history
+ * Script allows storage only on non-empty history index or the first empty history index 
+  * optimised code to make it more readable and faster
+  * added comments to explain fuctionality 
+
 
  6-6-2011
 
