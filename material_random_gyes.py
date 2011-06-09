@@ -193,10 +193,10 @@ class gyes_random_material(bpy.types.Operator):
     label = bpy.props.StringProperty()
     
     def execute(self, context):
-       for i in bpy.context.selected_objects :
-        if i.type == 'MESH' :
+        for i in bpy.context.selected_objects :
+            if i.type == 'MESH' :
             
-            rm.random_material(i.active_material,'Random')
+                rm.random_material(i.active_material,'Random')
         return{'FINISHED'}
     
 # Move to the previous hisory index and activate it
