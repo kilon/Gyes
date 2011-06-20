@@ -184,6 +184,11 @@ class gyes_panel(bpy.types.Panel):
             history_box.operator("gyes.store")
         else:
             history_box.label(text= "Not the first Empty Index")
+        if rm_index in rm.rm_history and rm.rm_history[rm_index] :
+            history_box.operator("gyes.delete")
+            row2 = history_box.row()
+            row2.operator("gyes.delete_start")
+            row2.operator("gyes.delete_end")    
         
 
 #this is the random material button
@@ -254,7 +259,34 @@ class store_to_history(bpy.types.Operator):
          
         
         return{'FINISHED'}
+
+class delete_from_history(bpy.types.Operator):
+    
+    bl_label = "Delete"
+    bl_idname = "gyes.delete"
+    
+    def execute(self, context):
         
+        return{'FINISHED'}           
+
+class delete_from_history_start(bpy.types.Operator):
+    
+    bl_label = "Del Start"
+    bl_idname = "gyes.delete_start"
+    
+    def execute(self, context):
+        
+        return{'FINISHED'}   
+
+class delete_from_history_end(bpy.types.Operator):
+    
+    bl_label = "Del End"
+    bl_idname = "gyes.delete_end"
+    
+    def execute(self, context):
+        
+        return{'FINISHED'}   
+         
 #registration is necessary for the script to appear in the GUI
 def register():
     bpy.utils.register_module(__name__)
