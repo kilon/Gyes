@@ -36,6 +36,20 @@ class random_material_class:
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 , )
         bpy.context.scene.history_index=1
         self.rm_history={}
+        self.delete_start_index=1
+    
+    #deletes from history an index but without leaving empty spaces, everythings is pushed back    
+    def delete_from_history(self):
+        
+        length = len(self.rm_history)
+        index = bpy.context.scene.history_index
+        for x in range(index , length):
+            if index != length :
+                self.rm_history[x]= self.rm_history[x+1] 
+        del self.rm_history[length]
+        length = len(self.rm_history) 
+        if index <= length:
+            self.activate()
     
     #store active material to history
     def store_to_history(self, mat):
@@ -243,7 +257,7 @@ class history_activate(bpy.types.Operator):
     def execute(self, context):
         rm_index = bpy.context.scene.history_index
         if rm.rm_history[rm_index] != {}:
-            rm.activatel()
+            rm.activate()
         
         return{'FINISHED'}
 
@@ -266,6 +280,7 @@ class delete_from_history(bpy.types.Operator):
     bl_idname = "gyes.delete"
     
     def execute(self, context):
+        rm.delete_from_history()
         
         return{'FINISHED'}           
 
@@ -275,6 +290,8 @@ class delete_from_history_start(bpy.types.Operator):
     bl_idname = "gyes.delete_start"
     
     def execute(self, context):
+        rm_index = bpy.context.scene.history_index
+        rm.delete_start_index = rm_index
         
         return{'FINISHED'}   
 
@@ -284,6 +301,10 @@ class delete_from_history_end(bpy.types.Operator):
     bl_idname = "gyes.delete_end"
     
     def execute(self, context):
+        delete_end_index = bpy.context.scene.history_index
+        bpy.context.scene.history_index = rm.delete_start_index
+        for x in range ( rm.delete_start_index , delete_end_index):
+            rm.delete_from_history()
         
         return{'FINISHED'}   
          
