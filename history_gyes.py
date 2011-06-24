@@ -19,18 +19,6 @@
 
 """ Copyright  Kilon 2011 GPL licence applies"""
 
-bl_info = {
-    "name": "Material_Gyes",
-    "description": "Random Material Generator",
-    "author": "Kilon",
-    "version": (0,1),
-    "blender": (2, 5, 7),
-    "api": 36147,
-    "location": "View3D > Left panel ",
-    "warning": '', # used for warning icon and text in addons panel
-    "wiki_url": "http://blenderartists.org/forum/showthread.php?218110-Gyes-%28Random-Material-Generator%29",
-    "tracker_url": "http://projects.blender.org/tracker/index.php?func=detail&aid=27470&group_id=153&atid=467",
-    "category": "Other"}
     
 # first we import all the required modules
 import bpy ,random , copy 
