@@ -21,28 +21,19 @@
 
     
 # first we import all the required modules
-import bpy ,random , copy 
 from bpy.props import *
 
 
-class random_material_class:
-    """ this class contains all fuctions and variables concerning generation of random material """
+class history:
+    """ this class contains all fuctions and variables concerning history"""
     
     def __init__(self):
-        """ several fuctions can be found here . All options for random generation . The History dictionary and several others."""
+        """The History dictionary and several others."""
      
-        bpy.types.Scene.rp = IntProperty(name="percentage", description = "percentage of randomisation" , min = 0 , max = 100 , default = 50)
-        bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Randomise Diffuse Shader" , default = True)
-        bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Randomise Diffuse Color", default = True  )
-        bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Randomise Diffuse Intensity" , default = True )    
-        bpy.types.Scene.rspecular_color = BoolProperty(name= "Specular Color" ,description = "Randomise Specular Color" , default = True)
-        bpy.types.Scene.rspecular_shader = BoolProperty(name= "Specular Shader" ,description = "Randomise Specular Shader" , default = True)
-        bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" , default = True)
-        bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" , default = True)
-        bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
+       
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 , )
         bpy.context.scene.history_index=1
-        self.rm_history={}
+        self.history={}
         self.delete_start_index=1
     
     #deletes from history an index but without leaving empty spaces, everythings is pushed back    
@@ -59,7 +50,7 @@ class random_material_class:
             self.activate()
     
     #store active material to history
-    def store_to_history(self, mat):
+    def store_to_history(self):
         scn = bpy.context.scene
         history_index = scn.history_index
         self.rm_history[history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
