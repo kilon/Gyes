@@ -44,6 +44,10 @@ class random_material_class:
         """ several fuctions can be found here . All options for random generation . The History dictionary and several others."""
      
         bpy.types.Scene.rp = IntProperty(name="percentage", description = "percentage of randomisation" , min = 0 , max = 100 , default = 50)
+        
+        bpy.types.Scene.simple_mode = BoolProperty(name= "Simple" ,description = "Simple Randomisation" , default = True)
+        bpy.types.Scene.template_mode = BoolProperty(name= "Template" ,description = "Template Randomisation" , default = False)
+        
         bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Randomise Diffuse Shader" , default = True)
         bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Randomise Diffuse Color", default = True  )
         bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Randomise Diffuse Intensity" , default = True )    
@@ -187,19 +191,29 @@ class gyes_panel(bpy.types.Panel):
     def draw(self, context):
         
         layout = self.layout
-        layout.label(text="Options")
-        box = layout.box()
-        box.prop(context.scene,"rdiffuse_shader")
-        box.prop(context.scene,"rdiffuse_color")
-        box.prop(context.scene,"rdiffuse_intensity")
-        box.prop(context.scene,"rspecular_shader")
-        box.prop(context.scene,"rspecular_color")
-        box.prop(context.scene,"rspecular_intensity")
-        box.prop(context.scene,"rspecular_hardness")
-        box.prop(context.scene,"rtransparency")
+        row = layout.row()
+        row.prop(context.scene,"simple_mode", toggle = True)
+        row.prop(context.scene,"template_mode", toggle = True )
         
-        layout.operator("gyes.random_material")
+        if bpy.context.scene.simple_mode == True :
+            #bpy.context.scene.template_mode = False
+            box = layout.box()
+            box.prop(context.scene,"rdiffuse_shader", toggle = True)
+            box.prop(context.scene,"rdiffuse_color", toggle = True)
+            box.prop(context.scene,"rdiffuse_intensity", toggle = True)
+            box.prop(context.scene,"rspecular_shader", toggle = True)
+            box.prop(context.scene,"rspecular_color", toggle = True)
+            box.prop(context.scene,"rspecular_intensity", toggle = True)
+            box.prop(context.scene,"rspecular_hardness", toggle = True)
+            box.prop(context.scene,"rtransparency", toggle = True)
+           
+            layout.operator("gyes.random_material")
         
+        if bpy.context.scene.template_mode== True : 
+            #bpy.context.scene.simple_mode = False
+            print()
+            
+                
         layout.label(text="History")
         history_box= layout.box()
         history_box.prop(context.scene, "history_index")
