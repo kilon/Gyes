@@ -43,19 +43,36 @@ class random_material_class:
     def __init__(self):
         """ several fuctions can be found here . All options for random generation . The History dictionary and several others."""
      
+        # have not used this one yet, its suppose to control randomisation percentage
         bpy.types.Scene.rp = IntProperty(name="percentage", description = "percentage of randomisation" , min = 0 , max = 100 , default = 50)
         
+        # various gui modes (simple, template etc)
+        bpy.types.Scene.gui_mode = EnumProperty(attr='mode', name='Mode', items=(
+('simple', 'Simple', 'The first item'),
+('templates', 'Templates', 'The second item'),
+('help', 'Help', 'The third item')), default='simple')
+       
+        # Here I define the selective areas that the user can enable or disable for randomisation in simple mode               
         bpy.types.Scene.simple_mode = BoolProperty(name= "Simple" ,description = "Simple Randomisation" , default = True)
+        
         bpy.types.Scene.template_mode = BoolProperty(name= "Template" ,description = "Template Randomisation" , default = False)
         
         bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Randomise Diffuse Shader" , default = True)
+        
         bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Randomise Diffuse Color", default = True  )
+        
         bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Randomise Diffuse Intensity" , default = True )    
         bpy.types.Scene.rspecular_color = BoolProperty(name= "Specular Color" ,description = "Randomise Specular Color" , default = True)
+        
         bpy.types.Scene.rspecular_shader = BoolProperty(name= "Specular Shader" ,description = "Randomise Specular Shader" , default = True)
+        
         bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" , default = True)
+        
         bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" , default = True)
+        
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
+        
+        # this is the dictionary that stores history
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 , )
         bpy.context.scene.history_index=1
         self.rm_history={}
@@ -99,7 +116,8 @@ class random_material_class:
         scn = bpy.context.scene
                   
         scn.history_index =len(self.rm_history)+1
-        #cheks that the user has allowed the randomisation of that specific parameter            
+        
+        #checks that the user has allowed the randomisation of that specific parameter            
         if scn.rdiffuse_color:
             mat.diffuse_color = (random.random(),random.random(),random.random())
             
@@ -110,7 +128,7 @@ class random_material_class:
             
     
         if scn.rdiffuse_intensity:
-            mat.diffuse_intensity = random.random()  # *(0.01*scn["rp"])
+            mat.diffuse_intensity = random.random()  
             
     
         if scn.rspecular_color:
@@ -129,7 +147,7 @@ class random_material_class:
             mat.specular_hardness = random.randrange(1,511,1)
             
     
-        mat.use_transparency = scn.rtransparency # random.randrange(0,2)
+        mat.use_transparency = scn.rtransparency 
         
     
         if mat.use_transparency == True :
@@ -146,6 +164,7 @@ class random_material_class:
                
       
         mat.ambient = random.random()
+        
         # after you finishes randomisation store the random material to history
         self.store_to_history(mat)
           
@@ -192,10 +211,11 @@ class gyes_panel(bpy.types.Panel):
         
         layout = self.layout
         row = layout.row()
-        row.prop(context.scene,"simple_mode", toggle = True)
-        row.prop(context.scene,"template_mode", toggle = True )
+        row.prop(context.scene , "gui_mode" )
         
-        if bpy.context.scene.simple_mode == True :
+        # check which Gui mode the user has selected (Simple is the default one and display the appropriate gui
+        
+        if bpy.context.scene.gui_mode == 'simple' :
             #bpy.context.scene.template_mode = False
             box = layout.box()
             box.prop(context.scene,"rdiffuse_shader", toggle = True)
@@ -209,11 +229,39 @@ class gyes_panel(bpy.types.Panel):
            
             layout.operator("gyes.random_material")
         
-        if bpy.context.scene.template_mode== True : 
+        if bpy.context.scene.gui_mode== 'templates' : 
             #bpy.context.scene.simple_mode = False
             print()
-            
+        
+        if bpy.context.scene.gui_mode== 'help' :
+            box = layout.box()
+            box.label(text=" Copyright 2011 Kilon  ")
+            box.label(text="Random Material  Generator Gyes ")
+            box.label(text="A tool that generates random materials.")
+            box.label(text="")
+            box.label(text="Simple Mode")
+            box.label(text="--------------------------")
+            box.label(text="In this mode you can do basic randomisation.")
+            box.label(text="Choose parameters you want to randomise by")
+            box.label(text="turning them on or off with clicking on them")
+            box.label(text="Hit the random button when you are ready")
+            box.label(text="Each time you hit the button the new random")
+            box.label(text="material is stored in a history index")
+            box.label(text="")
+            box.label(text="History")
+            box.label(text="--------------------------")
+            box.label(text="history index -> choose index")
+            box.label(text="previous -> previous index (activate)")
+            box.label(text="next -> next index (activate)")
+            box.label(text="activate -> use this index as active material")
+            box.label(text="delete -> delete this index")
+            box.label(text="del start -> start deletion from here")
+            box.label(text="del end -> end deletion here")
+         
+                  
                 
+        # Display the History Gui for all modes
+        
         layout.label(text="History")
         history_box= layout.box()
         history_box.prop(context.scene, "history_index")
@@ -307,6 +355,7 @@ class store_to_history(bpy.types.Operator):
         
         return{'FINISHED'}
 
+# delete from history
 class delete_from_history(bpy.types.Operator):
     
     bl_label = "Delete"
@@ -315,8 +364,9 @@ class delete_from_history(bpy.types.Operator):
     def execute(self, context):
         rm.delete_from_history()
         
-        return{'FINISHED'}           
-
+        return{'FINISHED'}
+               
+# start deletion from here
 class delete_from_history_start(bpy.types.Operator):
     
     bl_label = "Del Start"
@@ -328,6 +378,7 @@ class delete_from_history_start(bpy.types.Operator):
         
         return{'FINISHED'}   
 
+#end deletion here
 class delete_from_history_end(bpy.types.Operator):
     
     bl_label = "Del End"
