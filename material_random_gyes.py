@@ -256,14 +256,47 @@ class gyes_panel(bpy.types.Panel):
         if bpy.context.scene.gui_mode == 'simple_percentage' :
             #bpy.context.scene.template_mode = False
             box = layout.box()
-            box.prop(context.scene,"rdiffuse_shader_percentage")
-            box.prop(context.scene,"rdiffuse_color_percentage")
-            box.prop(context.scene,"rdiffuse_intensity_percentage")
-            box.prop(context.scene,"rspecular_shader_percentage")
-            box.prop(context.scene,"rspecular_color_percentage")
-            box.prop(context.scene,"rspecular_intensity_percentage")
-            box.prop(context.scene,"rspecular_hardness_percentage")
-            box.prop(context.scene,"rtransparency_percentage")
+            
+            if bpy.context.scene.rdiffuse_shader :
+                box.prop(context.scene,"rdiffuse_shader_percentage")
+            else:
+                box.label(text="Diffuse Shader is disabled ")
+                
+            if bpy.context.scene.rdiffuse_color :
+                box.prop(context.scene,"rdiffuse_color_percentage")
+            else:
+                box.label(text="Diffuse Color is disabled ")
+                
+            if bpy.context.scene.rdiffuse_intensity :
+                box.prop(context.scene,"rdiffuse_intensity_percentage")
+            else:
+                box.label(text="Diffuse Intensity is disabled ")
+                
+            if bpy.context.scene.rspecular_shader :
+                box.prop(context.scene,"rspecular_shader_percentage")
+            else:
+                box.label(text="Specular Shader is disabled ")
+                
+            if bpy.context.scene.rspecular_color :
+                box.prop(context.scene,"rspecular_color_percentage")
+            else:
+                box.label(text="Specular Color is disabled ")
+                
+            if bpy.context.scene.rspecular_intensity :
+                box.prop(context.scene,"rspecular_intensity_percentage")
+            else:
+                box.label(text="Specular Intensity is disabled ")
+                
+            if bpy.context.scene.rspecular_hardness :
+                box.prop(context.scene,"rspecular_hardness_percentage")
+            else:
+                box.label(text="Specular Hardness is disabled ")
+            
+            if bpy.context.scene.rtransparency :
+                box.prop(context.scene,"rtransparency_percentage")
+            else:
+                box.label(text="Transparency is disabled ")
+            
             layout.operator("gyes.random_material")
         
         if bpy.context.scene.gui_mode== 'templates' : 
