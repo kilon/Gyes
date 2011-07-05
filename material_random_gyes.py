@@ -73,27 +73,27 @@ class random_material_class:
         # Percentage randomisation
         bpy.types.Scene.general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100)
         
-        bpy.types.Scene.rdiffuse_shader_percentage =  IntProperty(name="Diffuse shader", description = " Diffuse shader percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rdiffuse_shader_percentage =  IntProperty(name="Diffuse shader", description = " Diffuse shader percentage of randomisation" , min = 0 , max = 100 , default = 0)
         
         
-        bpy.types.Scene.rdiffuse_color_percentage =  IntProperty(name="Diffuse Color", description = " Diffuse Color percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rdiffuse_color_percentage =  IntProperty(name="Diffuse Color", description = " Diffuse Color percentage of randomisation" , min = 0 , max = 100 , default = 0)
         
         
-        bpy.types.Scene.rdiffuse_intensity_percentage =  IntProperty(name="Diffuse Intensity", description = " Diffuse Intensity percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rdiffuse_intensity_percentage =  IntProperty(name="Diffuse Intensity", description = " Diffuse Intensity percentage of randomisation" , min = 0 , max = 100 , default = 0)
            
-        bpy.types.Scene.rspecular_color_percentage =  IntProperty(name="Specular Color", description = " Specular Color percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rspecular_color_percentage =  IntProperty(name="Specular Color", description = " Specular Color percentage of randomisation" , min = 0 , max = 100 , default = 0)
         
         
-        bpy.types.Scene.rspecular_shader_percentage =  IntProperty(name="Specular Shader", description = " Specular Shader percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rspecular_shader_percentage =  IntProperty(name="Specular Shader", description = " Specular Shader percentage of randomisation" , min = 0 , max = 100 , default = 0)
         
         
-        bpy.types.Scene.rspecular_intensity_percentage =  IntProperty(name="Specular Intensity", description = " Specular Intensity percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rspecular_intensity_percentage =  IntProperty(name="Specular Intensity", description = " Specular Intensity percentage of randomisation" , min = 0 , max = 100 , default = 0)
         
         
-        bpy.types.Scene.rspecular_hardness_percentage =  IntProperty(name="Specular Hardness", description = " Specular Hardness percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rspecular_hardness_percentage =  IntProperty(name="Specular Hardness", description = " Specular Hardness percentage of randomisation" , min = 0 , max = 100 , default = 0)
         
         
-        bpy.types.Scene.rtransparency_percentage =  IntProperty(name="Transparency", description = " Transparency percentage of randomisation" , min = 0 , max = 100 , default = 100)
+        bpy.types.Scene.rtransparency_percentage =  IntProperty(name="Transparency", description = " Transparency percentage of randomisation" , min = 0 , max = 100 , default = 0)
         
         
         # this is the dictionary that stores history
@@ -250,7 +250,7 @@ class gyes_panel(bpy.types.Panel):
             box.prop(context.scene,"rspecular_intensity", toggle = True)
             box.prop(context.scene,"rspecular_hardness", toggle = True)
             box.prop(context.scene,"rtransparency", toggle = True)
-            box.prop(context.scene,"general_percentage")           
+            box.prop(context.scene,"general_percentage", slider = True)           
             layout.operator("gyes.random_material")
             
         if bpy.context.scene.gui_mode == 'simple_percentage' :
@@ -258,42 +258,42 @@ class gyes_panel(bpy.types.Panel):
             box = layout.box()
             
             if bpy.context.scene.rdiffuse_shader :
-                box.prop(context.scene,"rdiffuse_shader_percentage")
+                box.prop(context.scene,"rdiffuse_shader_percentage", slider = True)
             else:
                 box.label(text="Diffuse Shader is disabled ")
                 
             if bpy.context.scene.rdiffuse_color :
-                box.prop(context.scene,"rdiffuse_color_percentage")
+                box.prop(context.scene,"rdiffuse_color_percentage", slider = True)
             else:
                 box.label(text="Diffuse Color is disabled ")
                 
             if bpy.context.scene.rdiffuse_intensity :
-                box.prop(context.scene,"rdiffuse_intensity_percentage")
+                box.prop(context.scene,"rdiffuse_intensity_percentage", slider = True)
             else:
                 box.label(text="Diffuse Intensity is disabled ")
                 
             if bpy.context.scene.rspecular_shader :
-                box.prop(context.scene,"rspecular_shader_percentage")
+                box.prop(context.scene,"rspecular_shader_percentage", slider = True)
             else:
                 box.label(text="Specular Shader is disabled ")
                 
             if bpy.context.scene.rspecular_color :
-                box.prop(context.scene,"rspecular_color_percentage")
+                box.prop(context.scene,"rspecular_color_percentage", slider = True)
             else:
                 box.label(text="Specular Color is disabled ")
                 
             if bpy.context.scene.rspecular_intensity :
-                box.prop(context.scene,"rspecular_intensity_percentage")
+                box.prop(context.scene,"rspecular_intensity_percentage", slider = True)
             else:
                 box.label(text="Specular Intensity is disabled ")
                 
             if bpy.context.scene.rspecular_hardness :
-                box.prop(context.scene,"rspecular_hardness_percentage")
+                box.prop(context.scene,"rspecular_hardness_percentage", slider = True)
             else:
                 box.label(text="Specular Hardness is disabled ")
             
             if bpy.context.scene.rtransparency :
-                box.prop(context.scene,"rtransparency_percentage")
+                box.prop(context.scene,"rtransparency_percentage", slider = True)
             else:
                 box.label(text="Transparency is disabled ")
             
