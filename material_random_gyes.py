@@ -101,6 +101,24 @@ class random_material_class:
         bpy.context.scene.history_index=1
         self.rm_history={}
         self.delete_start_index=1
+        
+    # compute randomisation based on the general or specific percentage chosen
+    # if the specific percentage is zero then the general percentage is used
+    def compute_percentage(min,max,value,percentage):
+        range = max-min
+        general_percentage = bpy.context.scene.general_percentage
+        
+        if percentage == 0:
+            percentage_random = ((range*(general_percentage/100))/2)-value + (range * (general_percentage / 100) * random.random())
+         else:
+             percentage_random = ((range*(percentage/100))/2)-value + (range * (percentage / 100) * random.random())
+             
+        if percentage_random > max:
+            percentage_random = max
+        if percentage_random < min:
+            percentage_random = min
+        
+        return percentage_random 
     
     #deletes from history an index but without leaving empty spaces, everythings is pushed back    
     def delete_from_history(self):
