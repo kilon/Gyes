@@ -104,14 +104,14 @@ class random_material_class:
         
     # compute randomisation based on the general or specific percentage chosen
     # if the specific percentage is zero then the general percentage is used
-    def compute_percentage(min,max,value,percentage):
+    def compute_percentage(self,min,max,value,percentage):
         range = max-min
         general_percentage = bpy.context.scene.general_percentage
         
         if percentage == 0:
-            percentage_random = ((range*(general_percentage/100))/2)-value + (range * (general_percentage / 100) * random.random())
+            percentage_random = ( value -((range*(general_percentage/100))/2) )+ (range * (general_percentage / 100) * random.random())
         else:
-            percentage_random = ((range*(percentage/100))/2)-value + (range * (percentage / 100) * random.random())
+            percentage_random = ( value - ((range*(percentage/100))/2)) + (range * (percentage / 100) * random.random())
              
         if percentage_random > max:
             percentage_random = max
@@ -161,7 +161,10 @@ class random_material_class:
         
         #checks that the user has allowed the randomisation of that specific parameter            
         if scn.rdiffuse_color:
-            mat.diffuse_color = (random.random(),random.random(),random.random())
+            rand_perc = scn.rdiffuse_color_percentage
+            mat.diffuse_color = (self.compute_percentage(0,1,mat.diffuse_color[0],rand_perc),
+            self.compute_percentage(0,1,mat.diffuse_color[1],rand_perc),
+            self.compute_percentage(0,1,mat.diffuse_color[2],rand_perc))
             
     
         if scn.rdiffuse_shader:
@@ -170,11 +173,14 @@ class random_material_class:
             
     
         if scn.rdiffuse_intensity:
-            mat.diffuse_intensity = random.random()  
+            mat.diffuse_intensity = self.compute_percentage(0,1, mat.diffuse_intensity , scn.rdiffuse_intensity_percentage) 
             
     
         if scn.rspecular_color:
-            mat.specular_color = (random.random(),random.random(),random.random())
+            rand_perc = scn.rspecular_color_percentage
+            mat.specular_color = (self.compute_percentage(0,1,mat.specular_color[0],rand_perc),
+            self.compute_percentage(0,1,mat.specular_color[1],rand_perc),
+            self.compute_percentage(0,1,mat.specular_color[2],rand_perc))
             
     
         if scn.rspecular_shader:
@@ -182,11 +188,11 @@ class random_material_class:
             
     
         if scn.rspecular_intensity:
-            mat.specular_intensity = random.random()
+            mat.specular_intensity =  self.compute_percentage(0,1, mat.specular_intensity , scn.rspecular_intensity_percentage)
             
     
         if scn.rspecular_hardness:
-            mat.specular_hardness = random.randrange(1,511,1)
+            mat.specular_hardness =  round(self.compute_percentage(1,511, mat.specular_hardness, scn.rspecular_shader_percentage))
             
     
         mat.use_transparency = scn.rtransparency 
@@ -194,18 +200,18 @@ class random_material_class:
     
         if mat.use_transparency == True :
             mat.transparency_method == random.choice(['MASK', 'Z_TRANSPARENCY', 'RAYTRACE'])
-            
+            mat.alpha = self.compute_percentage(0,1, mat.alpha, scn.rtransparency_percentage)
             if mat.transparency_method == 'MASK' :
-                mat.alpha = random.random()
+                bing =0     # dummy code
                 
             if mat.transparency_method == 'Z_TRANSPARENCY' :
-                mat.alpha = random.random()
-                
+                bing =0     # dummy code
+                 
                 mat.specular_alpha= random.random()
                 
                
       
-        mat.ambient = random.random()
+        mat.ambient = self.compute_percentage(0,1, mat.ambient, scn.general_percentage)
         
         # after you finishes randomisation store the random material to history
         self.store_to_history(mat)
@@ -314,7 +320,8 @@ class gyes_panel(bpy.types.Panel):
                 box.prop(context.scene,"rtransparency_percentage", slider = True)
             else:
                 box.label(text="Transparency is disabled ")
-            
+                
+            box.prop(context.scene,"general_percentage", slider = True)
             layout.operator("gyes.random_material")
         
         if bpy.context.scene.gui_mode== 'templates' : 
