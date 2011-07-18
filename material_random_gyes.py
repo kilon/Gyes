@@ -52,6 +52,11 @@ class random_material_class:
 ('simple_percentage', 'Simple percentage' , 'here you define individual percentage'),
 ('templates', 'Templates', 'The second item'),
 ('help', 'Help', 'The third item')), default='simple')
+        self.weirdprop = EnumProperty(attr='mode', name='Mode', items=(
+('simple', 'Simple', 'The first item'),
+('simple_percentage', 'Simple percentage' , 'here you define individual percentage'),
+('templates', 'Templates', 'The second item'),
+('help', 'Help', 'The third item')), default='simple')
        
         # Here I define the selective areas that the user can enable or disable for randomisation in simple mode               
                      
@@ -259,7 +264,7 @@ class gyes_panel(bpy.types.Panel):
         
         layout = self.layout
         row = layout.row()
-        row.prop(context.scene , "gui_mode" )
+        row.prop_menu_enum(context.scene , "gui_mode" )
         
         # check which Gui mode the user has selected (Simple is the default one and display the appropriate gui
         
@@ -326,8 +331,8 @@ class gyes_panel(bpy.types.Panel):
         
         if bpy.context.scene.gui_mode== 'templates' : 
             #bpy.context.scene.simple_mode = False
-            print()
-        
+            box = layout.box()
+                    
         if bpy.context.scene.gui_mode== 'help' :
             box = layout.box()
             box.label(text=" Copyright 2011 Kilon  ")
