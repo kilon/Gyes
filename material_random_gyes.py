@@ -110,8 +110,8 @@ class random_material_class:
         
         if percentage == 0:
             percentage_random = ((range*(general_percentage/100))/2)-value + (range * (general_percentage / 100) * random.random())
-         else:
-             percentage_random = ((range*(percentage/100))/2)-value + (range * (percentage / 100) * random.random())
+        else:
+            percentage_random = ((range*(percentage/100))/2)-value + (range * (percentage / 100) * random.random())
              
         if percentage_random > max:
             percentage_random = max
