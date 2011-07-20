@@ -60,18 +60,18 @@ class random_material_class:
        
         # Here I define the selective areas that the user can enable or disable for randomisation in simple mode               
                      
-        bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Randomise Diffuse Shader" , default = True)
+        bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Enable/Disable Randomisation for the  Diffuse Shader " , default = True)
         
-        bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Randomise Diffuse Color", default = True  )
+        bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Enable/Disable Randomisation for the Diffuse Color", default = True  )
         
-        bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Randomise Diffuse Intensity" , default = True )    
-        bpy.types.Scene.rspecular_color = BoolProperty(name= "Specular Color" ,description = "Randomise Specular Color" , default = True)
+        bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Enable/Disable Randomisation for the Diffuse Intensity" , default = True )    
+        bpy.types.Scene.rspecular_color = BoolProperty(name= "Specular Color" ,description = "Enable/Disable Randomisation for the Specular Color" , default = True)
         
-        bpy.types.Scene.rspecular_shader = BoolProperty(name= "Specular Shader" ,description = "Randomise Specular Shader" , default = True)
+        bpy.types.Scene.rspecular_shader = BoolProperty(name= "Specular Shader" ,description = "Enable/Disable Randomisation for the Specular Shader" , default = True)
         
-        bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Randomise Specular Intensity" , default = True)
+        bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Enable/Disable Randomisation for the Specular Intensity" , default = True)
         
-        bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Randomise Specular Hardness" , default = True)
+        bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Enable/Disable Randomisation for the Specular Hardness" , default = True)
         
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
         
@@ -103,7 +103,7 @@ class random_material_class:
         
         # this is the dictionary that stores history
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 , )
-        bpy.context.scene.history_index=1
+        #bpy.context.scene.history_index=1
         self.rm_history={}
         self.delete_start_index=1
         
@@ -249,7 +249,8 @@ class random_material_class:
     
     
 rm = random_material_class()
-                  
+bpy.context.scene.history_index=1  
+                
 # this the main panel
 class gyes_panel(bpy.types.Panel):
     bl_label = "Gyes"
