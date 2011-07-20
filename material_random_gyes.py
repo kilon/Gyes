@@ -249,7 +249,7 @@ class random_material_class:
     
     
 rm = random_material_class()
-bpy.context.scene.history_index=1  
+#bpy.context.scene.history_index=1
                 
 # this the main panel
 class gyes_panel(bpy.types.Panel):
@@ -269,7 +269,7 @@ class gyes_panel(bpy.types.Panel):
         
         # check which Gui mode the user has selected (Simple is the default one and display the appropriate gui
         
-        if bpy.context.scene.gui_mode == 'simple' :
+        if context.scene.gui_mode == 'simple' :
             #bpy.context.scene.template_mode = False
             box = layout.box()
             box.prop(context.scene,"rdiffuse_shader", toggle = True)
@@ -283,46 +283,46 @@ class gyes_panel(bpy.types.Panel):
             box.prop(context.scene,"general_percentage", slider = True)           
             layout.operator("gyes.random_material")
             
-        if bpy.context.scene.gui_mode == 'simple_percentage' :
+        if context.scene.gui_mode == 'simple_percentage' :
             #bpy.context.scene.template_mode = False
             box = layout.box()
             
-            if bpy.context.scene.rdiffuse_shader :
+            if context.scene.rdiffuse_shader :
                 box.prop(context.scene,"rdiffuse_shader_percentage", slider = True)
             else:
                 box.label(text="Diffuse Shader is disabled ")
                 
-            if bpy.context.scene.rdiffuse_color :
+            if context.scene.rdiffuse_color :
                 box.prop(context.scene,"rdiffuse_color_percentage", slider = True)
             else:
                 box.label(text="Diffuse Color is disabled ")
                 
-            if bpy.context.scene.rdiffuse_intensity :
+            if context.scene.rdiffuse_intensity :
                 box.prop(context.scene,"rdiffuse_intensity_percentage", slider = True)
             else:
                 box.label(text="Diffuse Intensity is disabled ")
                 
-            if bpy.context.scene.rspecular_shader :
+            if context.scene.rspecular_shader :
                 box.prop(context.scene,"rspecular_shader_percentage", slider = True)
             else:
                 box.label(text="Specular Shader is disabled ")
                 
-            if bpy.context.scene.rspecular_color :
+            if context.scene.rspecular_color :
                 box.prop(context.scene,"rspecular_color_percentage", slider = True)
             else:
                 box.label(text="Specular Color is disabled ")
                 
-            if bpy.context.scene.rspecular_intensity :
+            if context.scene.rspecular_intensity :
                 box.prop(context.scene,"rspecular_intensity_percentage", slider = True)
             else:
                 box.label(text="Specular Intensity is disabled ")
                 
-            if bpy.context.scene.rspecular_hardness :
+            if context.scene.rspecular_hardness :
                 box.prop(context.scene,"rspecular_hardness_percentage", slider = True)
             else:
                 box.label(text="Specular Hardness is disabled ")
             
-            if bpy.context.scene.rtransparency :
+            if context.scene.rtransparency :
                 box.prop(context.scene,"rtransparency_percentage", slider = True)
             else:
                 box.label(text="Transparency is disabled ")
@@ -330,11 +330,11 @@ class gyes_panel(bpy.types.Panel):
             box.prop(context.scene,"general_percentage", slider = True)
             layout.operator("gyes.random_material")
         
-        if bpy.context.scene.gui_mode== 'templates' : 
+        if context.scene.gui_mode== 'templates' : 
             #bpy.context.scene.simple_mode = False
             box = layout.box()
                     
-        if bpy.context.scene.gui_mode== 'help' :
+        if context.scene.gui_mode== 'help' :
             box = layout.box()
             box.label(text=" Copyright 2011 Kilon  ")
             box.label(text="Random Material  Generator Gyes ")
@@ -394,14 +394,14 @@ class gyes_panel(bpy.types.Panel):
         row = history_box.row()
         row.operator("gyes.previous")
         row.operator("gyes.next")
-        rm_index = bpy.context.scene.history_index
+        rm_index = context.scene.history_index
         
         if rm_index in rm.rm_history and rm.rm_history[rm_index] :
             history_box.operator("gyes.activate")
         else:
             history_box.label(text= "Empty Index ! ")
         
-        if bpy.context.scene.history_index < len(rm.rm_history)+2:
+        if context.scene.history_index < len(rm.rm_history)+2:
             history_box.operator("gyes.store")
         else:
             history_box.label(text= "Not the first Empty Index")
@@ -418,7 +418,7 @@ class gyes_random_material(bpy.types.Operator):
     label = bpy.props.StringProperty()
     
     def execute(self, context):
-        for i in bpy.context.selected_objects :
+        for i in context.selected_objects :
             if i.type == 'MESH' :
             
                 rm.random_material(i.active_material,'Random')
@@ -431,9 +431,9 @@ class history_previous(bpy.types.Operator):
     bl_idname = "gyes.previous"
     
     def execute(self, context):
-        if bpy.context.scene.history_index > 1 :
-            bpy.context.scene.history_index = bpy.context.scene.history_index -1
-            rm_index = bpy.context.scene.history_index
+        if context.scene.history_index > 1 :
+            context.scene.history_index = context.scene.history_index -1
+            rm_index = context.scene.history_index
             if rm_index in rm.rm_history and rm.rm_history[rm_index]:
                 rm.activate()
         
@@ -446,9 +446,9 @@ class history_next(bpy.types.Operator):
     bl_idname = "gyes.next"
     
     def execute(self, context):
-        if bpy.context.scene.history_index > 0 :
-            bpy.context.scene.history_index = bpy.context.scene.history_index +1
-            rm_index = bpy.context.scene.history_index
+        if context.scene.history_index > 0 :
+            context.scene.history_index = context.scene.history_index +1
+            rm_index = context.scene.history_index
             if rm_index in rm.rm_history and rm.rm_history[rm_index]:
                 rm.activate()
         
@@ -461,7 +461,7 @@ class history_activate(bpy.types.Operator):
     bl_idname = "gyes.activate"
     
     def execute(self, context):
-        rm_index = bpy.context.scene.history_index
+        rm_index = context.scene.history_index
         if rm.rm_history[rm_index] != {}:
             rm.activate()
         
@@ -474,7 +474,7 @@ class store_to_history(bpy.types.Operator):
     bl_idname = "gyes.store"
     
     def execute(self, context):
-        mat = bpy.context.selected_objects[0].active_material
+        mat = context.selected_objects[0].active_material
         rm.store_to_history(mat)
          
         
@@ -498,7 +498,7 @@ class delete_from_history_start(bpy.types.Operator):
     bl_idname = "gyes.delete_start"
     
     def execute(self, context):
-        rm_index = bpy.context.scene.history_index
+        rm_index = context.scene.history_index
         rm.delete_start_index = rm_index
         
         return{'FINISHED'}   
@@ -510,8 +510,8 @@ class delete_from_history_end(bpy.types.Operator):
     bl_idname = "gyes.delete_end"
     
     def execute(self, context):
-        delete_end_index = bpy.context.scene.history_index
-        bpy.context.scene.history_index = rm.delete_start_index
+        delete_end_index = context.scene.history_index
+        context.scene.history_index = rm.delete_start_index
         for x in range ( rm.delete_start_index , delete_end_index):
             rm.delete_from_history()
         
@@ -520,11 +520,11 @@ class delete_from_history_end(bpy.types.Operator):
 #registration is necessary for the script to appear in the GUI
 def register():
     bpy.utils.register_module(__name__)
-    pass
+    #pass
 
 def unregister():
     bpy.utils.register_module(__name__)
-    pass
+    #pass
 
 if __name__ == '__main__':
     register()
