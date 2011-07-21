@@ -519,12 +519,32 @@ class delete_from_history_end(bpy.types.Operator):
          
 #registration is necessary for the script to appear in the GUI
 def register():
-    bpy.utils.register_module(__name__)
-    #pass
+    #bpy.utils.register_class(random_material__class)
+    bpy.utils.register_class(gyes_panel)
+    bpy.utils.register_class(gyes_random_material)
+    bpy.utils.register_class(history_previous)
+    bpy.utils.register_class(history_next)
+    bpy.utils.register_class(history_activate)
+    bpy.utils.register_class(store_to_history)
+    bpy.utils.register_class(delete_from_history)
+    bpy.utils.register_class(delete_from_history_start)
+    bpy.utils.register_class(delete_from_history_end)
+
+    
 
 def unregister():
-    bpy.utils.register_module(__name__)
-    #pass
+    #bpy.utils.unregister_class(random_material__class)
+    bpy.utils.unregister_class(gyes_panel)
+    bpy.utils.unregister_class(gyes_random_material)
+    bpy.utils.unregister_class(history_previous)
+    bpy.utils.unregister_class(history_next)
+    bpy.utils.unregister_class(history_activate)
+    bpy.utils.unregister_class(store_to_history)
+    bpy.utils.unregister_class(delete_from_history)
+    bpy.utils.unregister_class(delete_from_history_start)
+    bpy.utils.unregister_class(delete_from_history_end)
+
+   
 
 if __name__ == '__main__':
     register()
