@@ -265,7 +265,7 @@ class gyes_panel(bpy.types.Panel):
         
         layout = self.layout
         row = layout.row()
-        row.prop_menu_enum(context.scene , "gui_mode" )
+        row.prop(context.scene , "gui_mode" )
         
         # check which Gui mode the user has selected (Simple is the default one and display the appropriate gui
         
