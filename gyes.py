@@ -429,8 +429,12 @@ class gyes_panel(bpy.types.Panel):
         
         if rm_index in rm.rm_history and rm.rm_history[rm_index] :
             row = history_box.row()
-            row.operator("gyes.random_activate")
-            row.operator("gyes.activate")
+            a = row.split(percentage = 0.2, align = True)
+            a.operator("gyes.random_activate")
+            
+            a.operator("gyes.activate")
+            
+             
         else:
             history_box.label(text= "Empty Index ! ")
         
