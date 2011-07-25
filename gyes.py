@@ -232,19 +232,48 @@ class random_material_class:
                 
                 scn = bpy.context.scene
                 mat = i.active_material
+                index = scn.history_index
         
-                mat.diffuse_color = self.rm_history[scn.history_index]["diffuse_color"]
-                mat.diffuse_shader = self.rm_history[scn.history_index]["diffuse_shader"]
-                mat.diffuse_intensity = self.rm_history[scn.history_index]["diffuse_intensity"]
-                mat.specular_color = self.rm_history[scn.history_index]["specular_color"]
-                mat.specular_shader = self.rm_history[scn.history_index]["specular_shader"]
-                mat.specular_intensity = self.rm_history[scn.history_index]["specular_intensity"]
-                mat.specular_hardness = self.rm_history[scn.history_index]["specular_hardness"]
-                mat.use_transparency = self.rm_history[scn.history_index]["use_transparency"]
-                mat.transparency_method = self.rm_history[scn.history_index]["transparency_method"]
-                mat.alpha = self.rm_history[scn.history_index]["alpha"]
-                mat.specular_alpha = self.rm_history[scn.history_index]["specular_alpha"]
-                mat.ambient = self.rm_history[scn.history_index]["ambient"]
+                mat.diffuse_color = self.rm_history[index]["diffuse_color"]
+                mat.diffuse_shader = self.rm_history[index]["diffuse_shader"]
+                mat.diffuse_intensity = self.rm_history[index]["diffuse_intensity"]
+                mat.specular_color = self.rm_history[index]["specular_color"]
+                mat.specular_shader = self.rm_history[index]["specular_shader"]
+                mat.specular_intensity = self.rm_history[index]["specular_intensity"]
+                mat.specular_hardness = self.rm_history[index]["specular_hardness"]
+                mat.use_transparency = self.rm_history[index]["use_transparency"]
+                mat.transparency_method = self.rm_history[index]["transparency_method"]
+                mat.alpha = self.rm_history[index]["alpha"]
+                mat.specular_alpha = self.rm_history[index]["specular_alpha"]
+                mat.ambient = self.rm_history[index]["ambient"]
+      
+    def random_activate(self):
+        
+        for i in bpy.context.selected_objects :
+            if i.type == 'MESH' :
+            
+                index = round(len(self.rm_history) * random.random())
+                
+                if index == 0 :
+                    index = 1
+                    
+                scn = bpy.context.scene
+                mat = i.active_material
+                scn.history_index=index
+        
+                mat.diffuse_color = self.rm_history[index]["diffuse_color"]
+                mat.diffuse_shader = self.rm_history[index]["diffuse_shader"]
+                mat.diffuse_intensity = self.rm_history[index]["diffuse_intensity"]
+                mat.specular_color = self.rm_history[index]["specular_color"]
+                mat.specular_shader = self.rm_history[index]["specular_shader"]
+                mat.specular_intensity = self.rm_history[index]["specular_intensity"]
+                mat.specular_hardness = self.rm_history[index]["specular_hardness"]
+                mat.use_transparency = self.rm_history[index]["use_transparency"]
+                mat.transparency_method = self.rm_history[index]["transparency_method"]
+                mat.alpha = self.rm_history[index]["alpha"]
+                mat.specular_alpha = self.rm_history[index]["specular_alpha"]
+                mat.ambient = self.rm_history[index]["ambient"]
+      
        
     
     
@@ -392,12 +421,16 @@ class gyes_panel(bpy.types.Panel):
         history_box= layout.box()
         history_box.prop(context.scene, "history_index")
         row = history_box.row()
+        row.operator("gyes.first")
         row.operator("gyes.previous")
         row.operator("gyes.next")
+        row.operator("gyes.last")
         rm_index = context.scene.history_index
         
         if rm_index in rm.rm_history and rm.rm_history[rm_index] :
-            history_box.operator("gyes.activate")
+            row = history_box.row()
+            row.operator("gyes.random_activate")
+            row.operator("gyes.activate")
         else:
             history_box.label(text= "Empty Index ! ")
         
@@ -411,11 +444,13 @@ class gyes_panel(bpy.types.Panel):
             row2.operator("gyes.delete_start")
             row2.operator("gyes.delete_end")    
         
-#this is the random material button
+# Generate the random material button
 class gyes_random_material(bpy.types.Operator):
+    
     bl_idname = "gyes.random_material"
     bl_label = "Random Material"
     label = bpy.props.StringProperty()
+    bl_description = "Generate the random material"
     
     def execute(self, context):
         for i in context.selected_objects :
@@ -423,12 +458,27 @@ class gyes_random_material(bpy.types.Operator):
             
                 rm.random_material(i.active_material,'Random')
         return{'FINISHED'}
+
+# Move to the first history index and activate it
+class history_first(bpy.types.Operator):
     
+    bl_label = "|<"
+    bl_idname = "gyes.first"
+    bl_description = "Move to the first history index and activate it"
+    
+    def execute(self, context):
+        context.scene.history_index = 1 
+        rm.activate()
+        
+        return{'FINISHED'}
+
+
 # Move to the previous hisory index and activate it
 class history_previous(bpy.types.Operator):
     
-    bl_label = "Previous"
+    bl_label = "<"
     bl_idname = "gyes.previous"
+    bl_description = "Move to the previous history index and activate it"
     
     def execute(self, context):
         if context.scene.history_index > 1 :
@@ -442,8 +492,9 @@ class history_previous(bpy.types.Operator):
 # Move to the next hisory index and activate it
 class history_next(bpy.types.Operator):
     
-    bl_label = "Next"
+    bl_label = ">"
     bl_idname = "gyes.next"
+    bl_description = "Move to the next history index and activate it"
     
     def execute(self, context):
         if context.scene.history_index > 0 :
@@ -453,12 +504,28 @@ class history_next(bpy.types.Operator):
                 rm.activate()
         
         return{'FINISHED'}
+    
 
-# 
+# Move to the last hisory index and activate it
+class history_last(bpy.types.Operator):
+    
+    bl_label = ">|"
+    bl_idname = "gyes.last"
+    bl_description = "Move to the last history index and activate it"
+    
+    def execute(self, context):
+        index = rm.rm_history 
+        context.scene.history_index = len(index) 
+        rm.activate()
+        
+        return{'FINISHED'}
+
+# The current history index becomes the active material 
 class history_activate(bpy.types.Operator):
     
     bl_label = "Activate"
     bl_idname = "gyes.activate"
+    bl_description = "The current history index becomes the active material"
     
     def execute(self, context):
         rm_index = context.scene.history_index
@@ -467,11 +534,27 @@ class history_activate(bpy.types.Operator):
         
         return{'FINISHED'}
 
+# A random history index becomes the active material 
+class history_random_activate(bpy.types.Operator):
+    
+    bl_label = "R"
+    bl_idname = "gyes.random_activate"
+    bl_description = "A random history index becomes the active material"
+    
+    def execute(self, context):
+        rm_index = context.scene.history_index
+        if rm.rm_history[rm_index] != {}:
+            rm.random_activate()
+        
+        return{'FINISHED'}
+
+
 # It stores current active material to the selected history index
 class store_to_history(bpy.types.Operator):
     
     bl_label = "Store"
     bl_idname = "gyes.store"
+    bl_description = " It stores current active material to the selected history index"
     
     def execute(self, context):
         mat = context.selected_objects[0].active_material
@@ -480,22 +563,24 @@ class store_to_history(bpy.types.Operator):
         
         return{'FINISHED'}
 
-# delete from history
+# Delete selected history index from history
 class delete_from_history(bpy.types.Operator):
     
     bl_label = "Delete"
     bl_idname = "gyes.delete"
+    bl_description = "Delete selected history index from history"
     
     def execute(self, context):
         rm.delete_from_history()
         
         return{'FINISHED'}
                
-# start deletion from here
+# Start deletion from this index
 class delete_from_history_start(bpy.types.Operator):
     
     bl_label = "Del Start"
     bl_idname = "gyes.delete_start"
+    bl_description = "Start deletion from this index"
     
     def execute(self, context):
         rm_index = context.scene.history_index
@@ -503,11 +588,12 @@ class delete_from_history_start(bpy.types.Operator):
         
         return{'FINISHED'}   
 
-#end deletion here
+# End deletion here and delete all selected indices
 class delete_from_history_end(bpy.types.Operator):
     
     bl_label = "Del End"
     bl_idname = "gyes.delete_end"
+    bl_description = "End deletion here and delete all selected indices"
     
     def execute(self, context):
         delete_end_index = context.scene.history_index
@@ -525,10 +611,14 @@ def register():
     bpy.utils.register_class(history_previous)
     bpy.utils.register_class(history_next)
     bpy.utils.register_class(history_activate)
+    bpy.utils.register_class(history_random_activate)
     bpy.utils.register_class(store_to_history)
     bpy.utils.register_class(delete_from_history)
     bpy.utils.register_class(delete_from_history_start)
     bpy.utils.register_class(delete_from_history_end)
+    bpy.utils.register_class(history_first)
+    bpy.utils.register_class(history_last)
+    
 
     
 
@@ -539,10 +629,13 @@ def unregister():
     bpy.utils.unregister_class(history_previous)
     bpy.utils.unregister_class(history_next)
     bpy.utils.unregister_class(history_activate)
+    bpy.utils.unregister_class(history_random_activate)
     bpy.utils.unregister_class(store_to_history)
     bpy.utils.unregister_class(delete_from_history)
     bpy.utils.unregister_class(delete_from_history_start)
     bpy.utils.unregister_class(delete_from_history_end)
+    bpy.utils.unregister_class(history_first)
+    bpy.utils.unregister_class(history_last)
 
    
 
