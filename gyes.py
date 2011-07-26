@@ -138,23 +138,6 @@ class random_material_class:
         if index <= length:
             self.activate()
     
-    #store active material to history
-    def store_to_history(self, mat):
-        scn = bpy.context.scene
-        history_index = scn.history_index
-        self.rm_history[history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
-          "diffuse_shader" : mat.diffuse_shader , 
-          "diffuse_intensity" : mat.diffuse_intensity ,
-          "specular_color" : tuple(mat.specular_color) , 
-          "specular_shader" : mat.specular_shader ,
-          "specular_intensity" : mat.specular_intensity , 
-          "specular_hardness" : mat.specular_hardness , 
-          "use_transparency" : mat.use_transparency , 
-          "transparency_method" : mat.transparency_method , 
-          "alpha" : mat.alpha , 
-          "specular_alpha" : mat.specular_alpha , 
-          "ambient" : mat.ambient }    
-        
     # the fuction that randomises the material 
     def random_material(self,active_material,name):
         
@@ -223,6 +206,32 @@ class random_material_class:
           
         return mat
     
+    #store active material to history
+    def store_to_history(self, mat):
+        scn = bpy.context.scene
+        history_index = scn.history_index
+        self.rm_history[history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
+          "alpha" : mat.alpha ,
+          "ambient" : mat.ambient ,
+          "darkness": mat.darkness,
+          "diffuse_color": mat.diffuse_color,
+          "diffuse_fresnel" : mat.diffuse_fresnel,
+          "diffuse_fresnel_factor" : mat.diffuse_fresnel_factor, 
+          "diffuse_intensity" : mat.diffuse_intensity ,
+          "diffuse_ramp_blend" : mat.diffuse_ramp_blend,
+          "diffuse_ramp_factor": mat.diffuse_ramp_factor,
+          "diffuse_ramp_input" : mat.diffuse_ramp_input,
+          "diffuse_shader" : mat.diffuse_shader , 
+          "diffuse_toon_size" : mat.diffuse_toon_size,
+          "diffuse_toon_smooth" : mat.diffuse_toon_smooth,
+          "specular_color" : tuple(mat.specular_color) , 
+          "specular_shader" : mat.specular_shader ,
+          "specular_intensity" : mat.specular_intensity , 
+          "specular_hardness" : mat.specular_hardness , 
+          "use_transparency" : mat.use_transparency , 
+          "transparency_method" : mat.transparency_method , 
+          "specular_alpha" : mat.specular_alpha }    
+        
     # Activate. Make active material the particular history index the user has chosen
     def activate(self):
         
@@ -233,19 +242,29 @@ class random_material_class:
                 scn = bpy.context.scene
                 mat = i.active_material
                 index = scn.history_index
-        
+                
+                
+                mat.alpha = self.rm_history[index]["alpha"]
+                mat.ambient = self.rm_history[index]["ambient"]
+                mat.darkness = self.rm_history[index]["darkness"]
                 mat.diffuse_color = self.rm_history[index]["diffuse_color"]
+                mat.diffuse_fresnel = self.rm_history[index]["diffuse_fresnel"]
+                mat.diffuse_fresnel_factor = self.rm_history[index]["diffuse_fresnel_factor"]
                 mat.diffuse_shader = self.rm_history[index]["diffuse_shader"]
                 mat.diffuse_intensity = self.rm_history[index]["diffuse_intensity"]
+                mat.diffuse_ramp_blend = self.rm_history[index]["diffuse_ramp_blend"]
+                mat.diffuse_ramp_factor = self.rm_history[index]["diffuse_ramp_factor"]
+                mat.diffuse_ramp_input = self.rm_history[index]["diffuse_ramp_input"]
+                mat.diffuse_toon_size = self.rm_history[index]["diffuse_toon_size"]
+                mat.diffuse_toon_smooth = self.rm_history[index]["diffuse_toon_smooth"]
                 mat.specular_color = self.rm_history[index]["specular_color"]
                 mat.specular_shader = self.rm_history[index]["specular_shader"]
                 mat.specular_intensity = self.rm_history[index]["specular_intensity"]
                 mat.specular_hardness = self.rm_history[index]["specular_hardness"]
                 mat.use_transparency = self.rm_history[index]["use_transparency"]
                 mat.transparency_method = self.rm_history[index]["transparency_method"]
-                mat.alpha = self.rm_history[index]["alpha"]
                 mat.specular_alpha = self.rm_history[index]["specular_alpha"]
-                mat.ambient = self.rm_history[index]["ambient"]
+                
       
     def random_activate(self):
         
@@ -261,18 +280,27 @@ class random_material_class:
                 mat = i.active_material
                 scn.history_index=index
         
+                mat.alpha = self.rm_history[index]["alpha"]
+                mat.ambient = self.rm_history[index]["ambient"]
+                mat.darkness = self.rm_history[index]["darkness"]
                 mat.diffuse_color = self.rm_history[index]["diffuse_color"]
+                mat.diffuse_fresnel = self.rm_history[index]["diffuse_fresnel"]
+                mat.diffuse_fresnel_factor = self.rm_history[index]["diffuse_fresnel_factor"]
                 mat.diffuse_shader = self.rm_history[index]["diffuse_shader"]
                 mat.diffuse_intensity = self.rm_history[index]["diffuse_intensity"]
+                mat.diffuse_ramp_blend = self.rm_history[index]["diffuse_ramp_blend"]
+                mat.diffuse_ramp_factor = self.rm_history[index]["diffuse_ramp_factor"]
+                mat.diffuse_ramp_input = self.rm_history[index]["diffuse_ramp_input"]
+                mat.diffuse_toon_size = self.rm_history[index]["diffuse_toon_size"]
+                mat.diffuse_toon_smooth = self.rm_history[index]["diffuse_toon_smooth"]
                 mat.specular_color = self.rm_history[index]["specular_color"]
                 mat.specular_shader = self.rm_history[index]["specular_shader"]
                 mat.specular_intensity = self.rm_history[index]["specular_intensity"]
                 mat.specular_hardness = self.rm_history[index]["specular_hardness"]
                 mat.use_transparency = self.rm_history[index]["use_transparency"]
                 mat.transparency_method = self.rm_history[index]["transparency_method"]
-                mat.alpha = self.rm_history[index]["alpha"]
                 mat.specular_alpha = self.rm_history[index]["specular_alpha"]
-                mat.ambient = self.rm_history[index]["ambient"]
+                
       
        
     
@@ -431,7 +459,6 @@ class gyes_panel(bpy.types.Panel):
             row = history_box.row()
             a = row.split(percentage = 0.2, align = True)
             a.operator("gyes.random_activate")
-            
             a.operator("gyes.activate")
             
              
