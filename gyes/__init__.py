@@ -18,7 +18,7 @@
 
 
 """ Copyright  Kilon 2011 GPL licence applies"""
-import bpy
+
 bl_info = {
     "name": "Material_Gyes",
     "description": "Gyes",
@@ -37,7 +37,7 @@ if "bpy" in locals():
     imp.reload(random_material_generator)
 else:
     from gyes import random_material_generator
-
+import bpy
 def register():
     bpy.utils.register_module(__name__)
 
