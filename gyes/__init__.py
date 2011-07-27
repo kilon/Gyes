@@ -21,11 +21,11 @@
 
 bl_info = {
     "name": "Material_Gyes",
-    "description": "Gyes",
+    "description": "Gyes is a collection of scripts that simplify , automate and extend blender",
     "author": "Kilon",
-    "version": (0,1),
-    "blender": (2, 5, 7),
-    "api": 36147,
+    "version": (0,5),
+    "blender": (2, 5, 8),
+    "api": 38600,
     "location": "View3D > Left panel ",
     "warning": '', # used for warning icon and text in addons panel
     "wiki_url": "http://blenderartists.org/forum/showthread.php?218110-Gyes-%28Random-Material-Generator%29",
