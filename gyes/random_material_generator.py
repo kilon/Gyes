@@ -219,8 +219,7 @@ class random_material_class:
     def activate(self):
         
         for i in bpy.context.selected_objects :
-            if i.type == 'MESH' :
-            
+            if i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history ) and rm.rm_history[bpy.context.scene.history_index]:
                 
                 scn = bpy.context.scene
                 mat = i.active_material
