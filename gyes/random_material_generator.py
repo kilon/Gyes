@@ -224,13 +224,30 @@ class random_material_class:
           "diffuse_shader" : mat.diffuse_shader , 
           "diffuse_toon_size" : mat.diffuse_toon_size,
           "diffuse_toon_smooth" : mat.diffuse_toon_smooth,
+          "emit" : mat.emit,
+          "invert_z" : mat.invert_z,
+          "mirror_color" : mat.mirror_color,
+          "offset_z" : mat.offset_z ,
+          "preview_render_type" : mat.preview_render_type,
+          "roughness" : mat.roughness,
+          "shadow_buffer_bias" : mat.shadow_buffer_bias,
+          "shadow_cast_alpha" : mat.shadow_cast_alpha , 
+          "shadow_only_type" : mat.shadow_only_type ,
+          "shadow_ray_bias" : mat.shadow_ray_bias ,
+          "specular_alpha" : mat.specular_alpha ,
           "specular_color" : tuple(mat.specular_color) , 
-          "specular_shader" : mat.specular_shader ,
-          "specular_intensity" : mat.specular_intensity , 
           "specular_hardness" : mat.specular_hardness , 
+          "specular_intensity" : mat.specular_intensity , 
+          "specular_ior" : mat.specular_ior,
+          "specular_ramp_blend" : mat.specular_ramp_blend, 
+          "specular_ramp_factor" : mat.specular_ramp_factor,
+          "specular_ramp_input" :  mat.specular_ramp_input,
+          "specular_shader" : mat.specular_shader ,
+          "specular_slope" : mat.specular_slope,
+          "specular_toon_size" : mat.specular_toon_size , 
+          "specular_toon_smooth" : mat.specular_toon_smooth,       
           "use_transparency" : mat.use_transparency , 
-          "transparency_method" : mat.transparency_method , 
-          "specular_alpha" : mat.specular_alpha }    
+          "transparency_method" : mat.transparency_method}    
         
     # Activate. Make active material the particular history index the user has chosen
     def activate(self):
@@ -257,13 +274,32 @@ class random_material_class:
                 mat.diffuse_ramp_input = self.rm_history[index]["diffuse_ramp_input"]
                 mat.diffuse_toon_size = self.rm_history[index]["diffuse_toon_size"]
                 mat.diffuse_toon_smooth = self.rm_history[index]["diffuse_toon_smooth"]
+                mat.emit = self.rm_history[index]["emit"]
+                mat.invert_z = self.rm_history[index]["invert_z"]
+                mat.mirror_color = self.rm_history[index]["mirror_color"]
+                mat.offset_z = self.rm_history[index]["offset_z"]
+                mat.preview_render_type = self.rm_history[index]["preview_render_type"]
+                mat.roughness = self.rm_history[index]["roughness"]
+                mat.shadow_buffer_bias = self.rm_history[index]["shadow_buffer_bias"]
+                mat.shadow_cast_alpha = self.rm_history[index]["shadow_cast_alpha"]
+                mat.shadow_only_type = self.rm_history[index]["shadow_only_type"]
+                mat.shadow_ray_bias = self.rm_history[index]["shadow_ray_bias"]
+                mat.specular_alpha = self.rm_history[index]["specular_alpha"]
                 mat.specular_color = self.rm_history[index]["specular_color"]
-                mat.specular_shader = self.rm_history[index]["specular_shader"]
-                mat.specular_intensity = self.rm_history[index]["specular_intensity"]
                 mat.specular_hardness = self.rm_history[index]["specular_hardness"]
+                mat.specular_intensity = self.rm_history[index]["specular_intensity"]
+                mat.specular_ior = self.rm_history[index]["specular_ior"]
+                mat.specular_ramp_blend = self.rm_history[index]["specular_ramp_blend"]
+                mat.specular_ramp_factor = self.rm_history[index]["specular_ramp_factor"]
+                mat.specular_ramp_input = self.rm_history[index]["specular_ramp_input"]
+                mat.specular_shader = self.rm_history[index]["specular_shader"]
+                mat.specular_slope = self.rm_history[index]["specular_slope"]
+                mat.specular_toon_size = self.rm_history[index]["specular_toon_size"]
+                mat.specular_toon_smooth = self.rm_history[index]["specular_toon_smooth"]
+                
                 mat.use_transparency = self.rm_history[index]["use_transparency"]
                 mat.transparency_method = self.rm_history[index]["transparency_method"]
-                mat.specular_alpha = self.rm_history[index]["specular_alpha"]
+                
                 
       
     def random_activate(self):
@@ -316,7 +352,8 @@ class gyes_panel(bpy.types.Panel):
     
     @classmethod    
     def poll(self, context):
-        if context.object and context.object.type == 'MESH':                    return len(context.object.data.materials)
+        if context.object and context.object.type == 'MESH':                    
+            return len(context.object.data.materials)
         
     def draw(self, context):
         
