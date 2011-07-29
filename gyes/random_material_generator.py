@@ -2,16 +2,12 @@
 import bpy ,random , copy 
 from bpy.props import *
 
-
 class random_material_class:
     """ this class contains all fuctions and variables concerning generation of random material """
     
     def __init__(self):
         """ several fuctions can be found here . All options for random generation . The History dictionary and several others."""
-        
-        # have not used this one yet, its suppose to control randomisation percentage
-              
-        
+                   
         # various gui modes (simple, template etc)
         bpy.types.Scene.gui_mode = EnumProperty(attr='mode', name='Mode', items=(
 ('simple', 'Simple', 'The first item'),
@@ -27,49 +23,27 @@ class random_material_class:
         # Here I define the selective areas that the user can enable or disable for randomisation in simple mode               
                      
         bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Enable/Disable Randomisation for the  Diffuse Shader " , default = True)
-        
         bpy.types.Scene.rdiffuse_color = BoolProperty(name= "Diffuse Color" ,description = "Enable/Disable Randomisation for the Diffuse Color", default = True  )
-        
         bpy.types.Scene.rdiffuse_intensity = BoolProperty(name= "Diffuse Intensity" ,description = "Enable/Disable Randomisation for the Diffuse Intensity" , default = True )    
         bpy.types.Scene.rspecular_color = BoolProperty(name= "Specular Color" ,description = "Enable/Disable Randomisation for the Specular Color" , default = True)
-        
         bpy.types.Scene.rspecular_shader = BoolProperty(name= "Specular Shader" ,description = "Enable/Disable Randomisation for the Specular Shader" , default = True)
-        
         bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Enable/Disable Randomisation for the Specular Intensity" , default = True)
-        
         bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Enable/Disable Randomisation for the Specular Hardness" , default = True)
-        
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
         
         # Percentage randomisation
         bpy.types.Scene.general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
-        
         bpy.types.Scene.rdiffuse_shader_percentage =  IntProperty(name="Diffuse shader", description = " Diffuse shader percentage of randomisation" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-        
-        
         bpy.types.Scene.rdiffuse_color_percentage =  IntProperty(name="Diffuse Color", description = " Diffuse Color percentage of randomisation" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-        
-        
         bpy.types.Scene.rdiffuse_intensity_percentage =  IntProperty(name="Diffuse Intensity", description = " Diffuse Intensity percentage of randomisation" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-           
         bpy.types.Scene.rspecular_color_percentage =  IntProperty(name="Specular Color", description = " Specular Color percentage of randomisation" , min = 0 , max = 100 , default = 0 , subtype = 'PERCENTAGE')
-        
-        
         bpy.types.Scene.rspecular_shader_percentage =  IntProperty(name="Specular Shader", description = " Specular Shader percentage of randomisation" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-        
-        
         bpy.types.Scene.rspecular_intensity_percentage =  IntProperty(name="Specular Intensity", description = " Specular Intensity percentage of randomisation" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-        
-        
         bpy.types.Scene.rspecular_hardness_percentage =  IntProperty(name="Specular Hardness", description = " Specular Hardness percentage of randomisation" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-        
-        
         bpy.types.Scene.rtransparency_percentage =  IntProperty(name="Transparency", description = " Transparency percentage of randomisation" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-        
         
         # this is the dictionary that stores history
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 , )
-        #bpy.context.scene.history_index=1
         self.rm_history={}
         self.delete_start_index=1
         
@@ -106,11 +80,8 @@ class random_material_class:
     
     # the fuction that randomises the material 
     def random_material(self,active_material,name):
-        
         mat = active_material
-                
         scn = bpy.context.scene
-                  
         scn.history_index =len(self.rm_history)+1
         
         #checks that the user has allowed the randomisation of that specific parameter            
@@ -123,48 +94,38 @@ class random_material_class:
     
         if scn.rdiffuse_shader:
             mat.diffuse_shader = random.choice(['LAMBERT','FRESNEL','TOON','MINNAERT'])
-            
-            
     
         if scn.rdiffuse_intensity:
             mat.diffuse_intensity = self.compute_percentage(0,1, mat.diffuse_intensity , scn.rdiffuse_intensity_percentage) 
-            
     
         if scn.rspecular_color:
             rand_perc = scn.rspecular_color_percentage
             mat.specular_color = (self.compute_percentage(0,1,mat.specular_color[0],rand_perc),
             self.compute_percentage(0,1,mat.specular_color[1],rand_perc),
             self.compute_percentage(0,1,mat.specular_color[2],rand_perc))
-            
     
         if scn.rspecular_shader:
             mat.specular_shader = random.choice(['COOKTORR','WARDISO','TOON','BLINN','PHONG'])
-            
     
         if scn.rspecular_intensity:
             mat.specular_intensity =  self.compute_percentage(0,1, mat.specular_intensity , scn.rspecular_intensity_percentage)
-            
     
         if scn.rspecular_hardness:
             mat.specular_hardness =  round(self.compute_percentage(1,511, mat.specular_hardness, scn.rspecular_shader_percentage))
             
-    
         mat.use_transparency = scn.rtransparency 
         
-    
-        if mat.use_transparency == True :
+         if mat.use_transparency == True :
             mat.transparency_method == random.choice(['MASK', 'Z_TRANSPARENCY', 'RAYTRACE'])
             mat.alpha = self.compute_percentage(0,1, mat.alpha, scn.rtransparency_percentage)
+  
             if mat.transparency_method == 'MASK' :
                 bing =0     # dummy code
                 
             if mat.transparency_method == 'Z_TRANSPARENCY' :
                 bing =0     # dummy code
-                 
                 mat.specular_alpha= random.random()
-                
-               
-      
+     
         mat.ambient = self.compute_percentage(0,1, mat.ambient, scn.general_percentage)
         
         # after you finishes randomisation store the random material to history
@@ -224,8 +185,7 @@ class random_material_class:
                 scn = bpy.context.scene
                 mat = i.active_material
                 index = scn.history_index
-                
-                
+                 
                 mat.alpha = self.rm_history[index]["alpha"]
                 mat.ambient = self.rm_history[index]["ambient"]
                 mat.darkness = self.rm_history[index]["darkness"]
@@ -264,9 +224,7 @@ class random_material_class:
                 
                 mat.use_transparency = self.rm_history[index]["use_transparency"]
                 mat.transparency_method = self.rm_history[index]["transparency_method"]
-                
-                
-      
+     
     def random_activate(self):
         
         for i in bpy.context.selected_objects :
@@ -319,13 +277,9 @@ class random_material_class:
                 
                 mat.use_transparency = self.rm_history[index]["use_transparency"]
                 mat.transparency_method = self.rm_history[index]["transparency_method"]
-                
-      
-       
-    
-    
+   
+# create the instance class for randomisation   
 rm = random_material_class()
-#bpy.context.scene.history_index=1
                 
 # this the main panel
 class gyes_panel(bpy.types.Panel):
@@ -347,7 +301,6 @@ class gyes_panel(bpy.types.Panel):
         # check which Gui mode the user has selected (Simple is the default one and display the appropriate gui
         
         if context.scene.gui_mode == 'simple' :
-            #bpy.context.scene.template_mode = False
             box = layout.box()
             box.prop(context.scene,"rdiffuse_shader", toggle = True)
             box.prop(context.scene,"rdiffuse_color", toggle = True)
@@ -361,7 +314,6 @@ class gyes_panel(bpy.types.Panel):
             layout.operator("gyes.random_material")
             
         if context.scene.gui_mode == 'simple_percentage' :
-            #bpy.context.scene.template_mode = False
             box = layout.box()
             
             if context.scene.rdiffuse_shader :
@@ -408,7 +360,6 @@ class gyes_panel(bpy.types.Panel):
             layout.operator("gyes.random_material")
         
         if context.scene.gui_mode== 'templates' : 
-            #bpy.context.scene.simple_mode = False
             box = layout.box()
                     
         if context.scene.gui_mode== 'help' :
@@ -459,10 +410,7 @@ class gyes_panel(bpy.types.Panel):
             box.label(text="")
             box.label(text="")
             box.label(text="")
-            
-         
-                  
-                
+                       
         # Display the History Gui for all modes
         
         layout.label(text="History")
@@ -481,7 +429,6 @@ class gyes_panel(bpy.types.Panel):
             a.operator("gyes.random_activate")
             a.operator("gyes.activate")
             
-             
         else:
             history_box.label(text= "Empty Index ! ")
         
@@ -656,7 +603,6 @@ class delete_from_history_end(bpy.types.Operator):
          
 #registration is necessary for the script to appear in the GUI
 def register():
-    #bpy.utils.register_class(random_material__class)
     bpy.utils.register_class(gyes_panel)
     bpy.utils.register_class(gyes_random_material)
     bpy.utils.register_class(history_previous)
@@ -674,7 +620,6 @@ def register():
     
 
 def unregister():
-    #bpy.utils.unregister_class(random_material__class)
     bpy.utils.unregister_class(gyes_panel)
     bpy.utils.unregister_class(gyes_random_material)
     bpy.utils.unregister_class(history_previous)
@@ -687,8 +632,6 @@ def unregister():
     bpy.utils.unregister_class(delete_from_history_end)
     bpy.utils.unregister_class(history_first)
     bpy.utils.unregister_class(history_last)
-
-   
 
 if __name__ == '__main__':
     register()
