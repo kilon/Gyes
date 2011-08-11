@@ -115,7 +115,7 @@ class random_material_class:
             
         mat.use_transparency = scn.rtransparency 
         
-         if mat.use_transparency == True :
+        if mat.use_transparency == True :
             mat.transparency_method == random.choice(['MASK', 'Z_TRANSPARENCY', 'RAYTRACE'])
             mat.alpha = self.compute_percentage(0,1, mat.alpha, scn.rtransparency_percentage)
   
