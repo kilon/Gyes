@@ -1,4 +1,6 @@
+# -*- coding: UTF-8 -*-
 # first we import all the required modules
+from code import InteractiveConsole
 import bpy ,random , copy 
 from bpy.props import *
 
@@ -47,6 +49,14 @@ class random_material_class:
         self.rm_history={}
         self.delete_start_index=1
         
+        # here is where history dictionary is saved with the blend file
+        # if the backup is already saved with the blend file it is used 
+        # to restory the history dictionary , if not it is created
+        
+        if hasattr(bpy.context.scene , "historybak")==False:
+            bpy.types.Scene.historybak = StringProperty()
+            print("created history backup")
+        
     # compute randomisation based on the general or specific percentage chosen
     # if the specific percentage is zero then the general percentage is used
     def compute_percentage(self,min,max,value,percentage):
@@ -77,6 +87,8 @@ class random_material_class:
         length = len(self.rm_history) 
         if index <= length:
             self.activate()
+            
+        bpy.context.scene.historybak = str(self.rm_history)
     
     # the fuction that randomises the material 
     def random_material(self,active_material,name):
@@ -141,7 +153,7 @@ class random_material_class:
           "alpha" : mat.alpha ,
           "ambient" : mat.ambient ,
           "darkness": mat.darkness,
-          "diffuse_color": mat.diffuse_color,
+          "diffuse_color": tuple(mat.diffuse_color),
           "diffuse_fresnel" : mat.diffuse_fresnel,
           "diffuse_fresnel_factor" : mat.diffuse_fresnel_factor, 
           "diffuse_intensity" : mat.diffuse_intensity ,
@@ -153,7 +165,7 @@ class random_material_class:
           "diffuse_toon_smooth" : mat.diffuse_toon_smooth,
           "emit" : mat.emit,
           "invert_z" : mat.invert_z,
-          "mirror_color" : mat.mirror_color,
+          "mirror_color" : tuple(mat.mirror_color),
           "offset_z" : mat.offset_z ,
           "preview_render_type" : mat.preview_render_type,
           "roughness" : mat.roughness,
@@ -216,23 +228,26 @@ class random_material_class:
         self.rm_history[history_index].update({"node_tree":{}})
             
         #store each node of the node tree to history 
-        self.rm_history[history_index]["node_tree"].update({"nodes":{}})
-        for x in range(0,len(nt.nodes)):
-            self.rm_history[history_index]["node_tree"]["nodes"].update({x:{"name": nt.nodes[x].name , 
-            "pos_x": nt.nodes[x].location[0] ,
-            "pos_y": nt.nodes[x].location[1] ,
-            "type" : nt.nodes[x].type }})
+        if self.rm_history[history_index]["use_nodes"]:
             
-            
-        #store each node link to history
-        self.rm_history[history_index]["node_tree"].update({"links":{}})
-        for x in range(0,len(nt.links)):     
-            self.rm_history[history_index]["node_tree"]["links"].update({x:{"from_node": nt.links[x].from_node.name , 
-            "to_node": nt.links[x].to_node.name ,
-            "from_socket": nt.links[x].from_socket.name ,
-            "to_socket" : nt.links[x].to_socket.name }}) 
+            self.rm_history[history_index]["node_tree"].update({"nodes":{}})
+            for x in range(0,len(nt.nodes)):
+                self.rm_history[history_index]["node_tree"]["nodes"].update({x:{"name": nt.nodes[x].name , 
+                "pos_x": nt.nodes[x].location[0] ,
+                "pos_y": nt.nodes[x].location[1] ,
+                "type" : nt.nodes[x].type }})
+                
+                
+            #store each node link to history
+            self.rm_history[history_index]["node_tree"].update({"links":{}})
+            for x in range(0,len(nt.links)):     
+                self.rm_history[history_index]["node_tree"]["links"].update({x:{"from_node": nt.links[x].from_node.name , 
+                "to_node": nt.links[x].to_node.name ,
+                "from_socket": nt.links[x].from_socket.name ,
+                "to_socket" : nt.links[x].to_socket.name }}) 
            
         print("node_tree : ",self.rm_history[history_index]["node_tree"])            
+        bpy.context.scene.historybak = str(self.rm_history)
         
     # Activate. Make active material the particular history index the user has chosen
     def activate(self, random_assign = False):
@@ -340,34 +355,35 @@ class random_material_class:
                         mat.diffuse_ramp.elements[el].color[3] = self.rm_history[index]["diffuse_ramp"][el]["color"][3]
                         mat.diffuse_ramp.elements[el].position = self.rm_history[index]["diffuse_ramp"][el]["position"]
                     
-                    # activate node tree nodes
-                    
-                    nt = mat.node_tree
-                    
-                    #first remove any existent nodes to replace them with new ones
-                    for x in range(0,len(nt.nodes)):
-                        nt.nodes.remove(nt.nodes[-1])
+                    if self.rm_history[history_index]["use_nodes"]:
+                        # activate node tree nodes
                         
-                    # now set the new nodes
-                    
-                    for x in range(0, len(self.rm_history[index]["node_tree"]["nodes"])):
+                        nt = mat.node_tree
                         
-                        nt.nodes.new(self.rm_history[index]["node_tree"]["nodes"][x]["type"])
-                        nt.nodes[x].name = self.rm_history[index]["node_tree"]["nodes"][x]["name"]
-                        nt.nodes[x].location[0] = self.rm_history[index]["node_tree"]["nodes"][x]["pos_x"]
-                        nt.nodes[x].location[1] = self.rm_history[index]["node_tree"]["nodes"][x]["pos_y"]
-                        print(nt.nodes[x].name)
-                    
-                    for x in range(0, len(self.rm_history[index]["node_tree"]["links"])):
+                        #first remove any existent nodes to replace them with new ones
+                        for x in range(0,len(nt.nodes)):
+                            nt.nodes.remove(nt.nodes[-1])
+                            
+                        # now set the new nodes
                         
-                        node_name_source = self.rm_history[index]["node_tree"]["links"][x]["from_node"]
-                        node_name_destination = self.rm_history[index]["node_tree"]["links"][x]["to_node"]
-                        socket_name_source = self.rm_history[index]["node_tree"]["links"][x]["from_socket"]
-                        socket_name_destination = self.rm_history[index]["node_tree"]["links"][x]["to_socket"]
+                        for x in range(0, len(self.rm_history[index]["node_tree"]["nodes"])):
+                            
+                            nt.nodes.new(self.rm_history[index]["node_tree"]["nodes"][x]["type"])
+                            nt.nodes[x].name = self.rm_history[index]["node_tree"]["nodes"][x]["name"]
+                            nt.nodes[x].location[0] = self.rm_history[index]["node_tree"]["nodes"][x]["pos_x"]
+                            nt.nodes[x].location[1] = self.rm_history[index]["node_tree"]["nodes"][x]["pos_y"]
+                            print(nt.nodes[x].name)
                         
-                        print("trying to connect node["+node_name_source+"] socket ["+socket_name_source+"] with node["+node_name_destination+"] socket["+socket_name_destination+"]")
-                        nt.links.new(nt.nodes[node_name_source].outputs[socket_name_source],nt.nodes[node_name_destination].inputs[socket_name_destination])
-                        
+                        for x in range(0, len(self.rm_history[index]["node_tree"]["links"])):
+                            
+                            node_name_source = self.rm_history[index]["node_tree"]["links"][x]["from_node"]
+                            node_name_destination = self.rm_history[index]["node_tree"]["links"][x]["to_node"]
+                            socket_name_source = self.rm_history[index]["node_tree"]["links"][x]["from_socket"]
+                            socket_name_destination = self.rm_history[index]["node_tree"]["links"][x]["to_socket"]
+                            
+                            print("trying to connect node["+node_name_source+"] socket ["+socket_name_source+"] with node["+node_name_destination+"] socket["+socket_name_destination+"]")
+                            nt.links.new(nt.nodes[node_name_source].outputs[socket_name_source],nt.nodes[node_name_destination].inputs[socket_name_destination])
+                            
                         
                         
                         
@@ -534,7 +550,11 @@ class gyes_panel(bpy.types.Panel):
             history_box.operator("gyes.delete")
             row2 = history_box.row()
             row2.operator("gyes.delete_start")
-            row2.operator("gyes.delete_end")    
+            row2.operator("gyes.delete_end")
+        if hasattr(bpy.context.scene,"historybak") and bpy.context.scene.historybak!='':
+            history_box.operator("gyes.restore")
+        else:
+            history_box.label(text="Backup not Found")    
         
 # Generate the random material button
 class gyes_random_material(bpy.types.Operator):
@@ -693,7 +713,27 @@ class delete_from_history_end(bpy.types.Operator):
         for x in range ( rm.delete_start_index , delete_end_index):
             rm.delete_from_history()
         
-        return{'FINISHED'}   
+        return{'FINISHED'} 
+    
+# End deletion here and delete all selected indices
+class restore_history(bpy.types.Operator):
+    
+    bl_label = "Restore"
+    bl_idname = "gyes.restore"
+    bl_description = "Restore history"
+    
+    def execute(self, context):
+        
+        s=""
+        s = bpy.context.scene.historybak
+        print(s)
+        rm.rm_history=eval(s)
+        
+        print("restored history dictionary") 
+        
+        return{'FINISHED'} 
+    
+ 
          
 #registration is necessary for the script to appear in the GUI
 def register():
@@ -709,6 +749,7 @@ def register():
     bpy.utils.register_class(delete_from_history_end)
     bpy.utils.register_class(history_first)
     bpy.utils.register_class(history_last)
+    bpy.utils.register_class(restore_history)
    
 def unregister():
     bpy.utils.unregister_class(gyes_panel)
@@ -723,6 +764,7 @@ def unregister():
     bpy.utils.unregister_class(delete_from_history_end)
     bpy.utils.unregister_class(history_first)
     bpy.utils.unregister_class(history_last)
-
+    bpy.utils.unregister_class(restore_history)
+    
 if __name__ == '__main__':
     register()
