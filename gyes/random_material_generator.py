@@ -3,6 +3,7 @@
 from code import InteractiveConsole
 import bpy ,random , copy 
 from bpy.props import *
+import textwrap
 
 class random_material_class:
     """ this class contains all fuctions and variables concerning generation of random material """
@@ -48,6 +49,9 @@ class random_material_class:
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
         self.rm_history={}
         self.delete_start_index=1
+        
+        # the prop that controls the text wrap in help menu
+        bpy.types.Scene.text_width = IntProperty(name = "Text Width" , description = "The width above which the text wraps" , default = 20 , max = 180 , min = 1)
         
         # here is where history dictionary is saved with the blend file
         # if the backup is already saved with the blend file it is used 
@@ -383,8 +387,17 @@ class random_material_class:
                             
                             print("trying to connect node["+node_name_source+"] socket ["+socket_name_source+"] with node["+node_name_destination+"] socket["+socket_name_destination+"]")
                             nt.links.new(nt.nodes[node_name_source].outputs[socket_name_source],nt.nodes[node_name_destination].inputs[socket_name_destination])
-                            
-                        
+    
+    # a nice multi label                        
+    def multi_label(self, text, ui,text_width):
+        
+        for x in range(0,len(text)):
+            el = textwrap.wrap(text[x], width = text_width)
+            
+            for y in range(0,len(el)):
+                print("text : "+el[y])
+                ui.label(text=el[y])
+                                
                         
                         
      
@@ -474,6 +487,32 @@ class gyes_panel(bpy.types.Panel):
                     
         if context.scene.gui_mode== 'help' :
             box = layout.box()
+            help_text={0:"",1:"Copyright 2011 Kilon  ",    
+            2:"Random Material  Generator Gyes ",
+            3:"A tool that generates random materials.",
+            4:"",
+            5:"Simple Mode",
+            6:"--------------------------",
+            7:"In this mode you can do basic randomisation. Choose parameters you want to randomise by turning them on or off with clicking on them. Hit the random button when you are ready. Each time you hit the button the new random material is stored in a history index",
+            8:"",
+            9:"History",
+            10:"--------------------------",
+            11:"history index -> choose index",
+            12:"previous -> previous index (activate)",
+            13:"next -> next index (activate)",
+            14:"activate -> use this index as active material",
+            15:"delete -> delete this index",
+            16:"del start -> start deletion from here",
+            17:"del end -> end deletion here",
+            18:"",
+            19:"Percentage",
+            20:"--------------------------",
+            21:"Percentage randomisation means that the parameter is randomised inside a range of percentage of the full range of the value. When a specific percentage is zero, the general percentage is used instead for that area. When a specific percentage is not zero then general percentage is ignored and specific percentage is used instead. If you dont want to randomise that area at all, in Simple Mode use the corresponding button to completely disable that area , the percentage slider will also be disable in the percentage mode. Randomisation takes always the current value as starting point so the next randomisation will use the current randomised value. Randomisation is always 50% of the specific percentage bellow the current value and 50% above . If the percentage exceeed minimum and maximum values of the full range, then it will default to minimum and maximum accordingly. "}
+            w=bpy.context.scene.text_width
+            box.prop(context.scene,"text_width", slider =True)
+            rm.multi_label(help_text,box,w) 
+           
+            """box = layout.box()
             box.label(text=" Copyright 2011 Kilon  ")
             box.label(text="Random Material  Generator Gyes ")
             box.label(text="A tool that generates random materials.")
@@ -519,7 +558,7 @@ class gyes_panel(bpy.types.Panel):
             box.label(text="")
             box.label(text="")
             box.label(text="")
-            box.label(text="")
+            box.label(text="")"""
                        
         # Display the History Gui for all modes
         
