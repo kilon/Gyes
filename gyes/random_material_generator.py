@@ -249,8 +249,12 @@ class random_material_class:
                 "to_node": nt.links[x].to_node.name ,
                 "from_socket": nt.links[x].from_socket.name ,
                 "to_socket" : nt.links[x].to_socket.name }}) 
+        
+        # Texture
            
-        print("node_tree : ",self.rm_history[history_index]["node_tree"])            
+        print("node_tree : ",self.rm_history[history_index]["node_tree"])
+        
+                    
         bpy.context.scene.historybak = str(self.rm_history)
         
     # Activate. Make active material the particular history index the user has chosen
@@ -512,53 +516,7 @@ class gyes_panel(bpy.types.Panel):
             box.prop(context.scene,"text_width", slider =True)
             rm.multi_label(help_text,box,w) 
            
-            """box = layout.box()
-            box.label(text=" Copyright 2011 Kilon  ")
-            box.label(text="Random Material  Generator Gyes ")
-            box.label(text="A tool that generates random materials.")
-            box.label(text="")
-            box.label(text="Simple Mode")
-            box.label(text="--------------------------")
-            box.label(text="In this mode you can do basic randomisation.")
-            box.label(text="Choose parameters you want to randomise by")
-            box.label(text="turning them on or off with clicking on them")
-            box.label(text="Hit the random button when you are ready")
-            box.label(text="Each time you hit the button the new random")
-            box.label(text="material is stored in a history index")
-            box.label(text="")
-            box.label(text="History")
-            box.label(text="--------------------------")
-            box.label(text="history index -> choose index")
-            box.label(text="previous -> previous index (activate)")
-            box.label(text="next -> next index (activate)")
-            box.label(text="activate -> use this index as active material")
-            box.label(text="delete -> delete this index")
-            box.label(text="del start -> start deletion from here")
-            box.label(text="del end -> end deletion here")
-            box.label(text="")
-            box.label(text="Percentage")
-            box.label(text="--------------------------")
-            box.label(text="Percentage randomisation means that the parameter")
-            box.label(text="is randomised inside a range of percentage of the")
-            box.label(text=" full range of the value. When a specific percentage ")
-            box.label(text="is zero, the general percentage is used instead for ")
-            box.label(text="that area. When a specific percentage is not zero then ")
-            box.label(text="general percentage is ignored and specific percentage ")
-            box.label(text="is used instead. If you dont want to randomise that area ")
-            box.label(text="at all, in Simple Mode use the corresponding button to")
-            box.label(text="completely disable that area , the percentage slider")
-            box.label(text="will also be disable in the percentage mode.")
-            box.label(text="Randomisation takes always the current value as starting ")
-            box.label(text="point so the next randomisation will use the current randomised ")
-            box.label(text="value. Randomisation is always 50% of the specific percentage ")
-            box.label(text="bellow the current value and 50% above . If the percentage exceeed")
-            box.label(text="minimum and maximum values of the full range, then it will default")
-            box.label(text="to minimum and maximum accordingly. ")
-            box.label(text="")
-            box.label(text="")
-            box.label(text="")
-            box.label(text="")
-            box.label(text="")"""
+           
                        
         # Display the History Gui for all modes
         
@@ -574,9 +532,15 @@ class gyes_panel(bpy.types.Panel):
         
         if rm_index in rm.rm_history and rm.rm_history[rm_index] :
             row = history_box.row()
-            a = row.split(percentage = 0.2, align = True)
-            a.operator("gyes.random_activate")
+            a = row.split(percentage = 0.3, align = True)
+           
             a.operator("gyes.activate")
+            a.operator("gyes.animate")
+            b=a.split(percentage = 0.3, align = True)
+            b.operator("gyes.x")
+            b.operator("gyes.random_activate")
+            
+            
             
         else:
             history_box.label(text= "Empty Index ! ")
@@ -765,14 +729,172 @@ class restore_history(bpy.types.Operator):
         
         s=""
         s = bpy.context.scene.historybak
-        print(s)
+       
         rm.rm_history=eval(s)
         
         print("restored history dictionary") 
         
         return{'FINISHED'} 
     
+# Animate inserts a keyframe for every randomised material parameter except nodes
+class animate(bpy.types.Operator):
+    
+    bl_label = "Animate"
+    bl_idname = "gyes.animate"
+    bl_description = "Animate inserts a keyframe for every non read only material parameter"
+    
+    def execute(self, context):
+        framen = bpy.context.scene.frame_current
+        for i in range(0,len(bpy.context.selected_objects)):
+            mat = bpy.context.selected_objects[i].active_material
+            
+            animated_attributes=["alpha",
+            "ambient",
+            "darkness",
+            "diffuse_color",
+            "diffuse_fresnel",
+            "diffuse_fresnel_factor",
+            "diffuse_intensity",
+            "diffuse_ramp_blend",
+            "diffuse_ramp_factor",
+            "diffuse_ramp_input",
+            "diffuse_shader",
+            "diffuse_toon_size",
+            "diffuse_toon_smooth",
+            "emit",
+            "invert_z",
+            "mirror_color",
+            "offset_z",
+            "preview_render_type",
+            "roughness",
+            "shadow_buffer_bias",
+            "shadow_cast_alpha",
+            "shadow_only_type",
+            "shadow_ray_bias",
+            "specular_alpha",
+            "specular_color",
+            "specular_hardness",
+            "specular_intensity",
+            "specular_ior",
+            "specular_ramp_blend",
+            "specular_ramp_factor",
+            "specular_ramp_input",
+            "specular_shader",
+            "specular_slope",
+            "specular_toon_size",
+            "specular_toon_smooth",
+            "translucency",
+            "transparency_method",
+            "type",
+            "use_cast_approximate",
+            "use_cast_buffer_shadows",
+            "use_cast_shadows_only",
+            "use_cubic",
+            "use_diffuse_ramp",
+            "use_face_texture",
+            "use_face_texture_alpha",
+            "use_full_oversampling",
+            "use_light_group_exclusive",
+            "use_mist",
+            "use_nodes",
+            "use_object_color",
+            "use_only_shadow",
+            "use_ray_shadow_bias",
+            "use_raytrace",
+            "use_shadeless",
+            "use_shadows",
+            "use_sky",
+            "use_specular_ramp",
+            "use_tangent_shading",
+            "use_textures",
+            "use_transparency",
+            "use_transparent_shadows",
+            "use_vertex_color_paint"]
+            
+            for y in range(0,len(animated_attributes)):
+                mat.keyframe_insert(data_path = animated_attributes[y], frame = framen)
+        
+        return{'FINISHED'}
  
+# Remove Animation
+class x(bpy.types.Operator):
+    
+    bl_label = "X"
+    bl_idname = "gyes.x"
+    bl_description = "Reverse Animate by deleting every keyframe inserted by animate for every non read only material parameter"
+    
+    def execute(self, context):
+        framen = bpy.context.scene.frame_current
+        for i in range(0,len(bpy.context.selected_objects)):
+            mat = bpy.context.selected_objects[i].active_material
+            
+            animated_attributes=["alpha",
+            "ambient",
+            "darkness",
+            "diffuse_color",
+            "diffuse_fresnel",
+            "diffuse_fresnel_factor",
+            "diffuse_intensity",
+            "diffuse_ramp_blend",
+            "diffuse_ramp_factor",
+            "diffuse_ramp_input",
+            "diffuse_shader",
+            "diffuse_toon_size",
+            "diffuse_toon_smooth",
+            "emit",
+            "invert_z",
+            "mirror_color",
+            "offset_z",
+            "preview_render_type",
+            "roughness",
+            "shadow_buffer_bias",
+            "shadow_cast_alpha",
+            "shadow_only_type",
+            "shadow_ray_bias",
+            "specular_alpha",
+            "specular_color",
+            "specular_hardness",
+            "specular_intensity",
+            "specular_ior",
+            "specular_ramp_blend",
+            "specular_ramp_factor",
+            "specular_ramp_input",
+            "specular_shader",
+            "specular_slope",
+            "specular_toon_size",
+            "specular_toon_smooth",
+            "translucency",
+            "transparency_method",
+            "type",
+            "use_cast_approximate",
+            "use_cast_buffer_shadows",
+            "use_cast_shadows_only",
+            "use_cubic",
+            "use_diffuse_ramp",
+            "use_face_texture",
+            "use_face_texture_alpha",
+            "use_full_oversampling",
+            "use_light_group_exclusive",
+            "use_mist",
+            "use_nodes",
+            "use_object_color",
+            "use_only_shadow",
+            "use_ray_shadow_bias",
+            "use_raytrace",
+            "use_shadeless",
+            "use_shadows",
+            "use_sky",
+            "use_specular_ramp",
+            "use_tangent_shading",
+            "use_textures",
+            "use_transparency",
+            "use_transparent_shadows",
+            "use_vertex_color_paint"]
+            
+            for y in range(0,len(animated_attributes)):
+                mat.keyframe_delete(data_path = animated_attributes[y], frame = framen)
+        
+        return{'FINISHED'}
          
 #registration is necessary for the script to appear in the GUI
 def register():
@@ -789,7 +911,8 @@ def register():
     bpy.utils.register_class(history_first)
     bpy.utils.register_class(history_last)
     bpy.utils.register_class(restore_history)
-   
+    bpy.utils.register_class(animate)
+    bpy.utils.register_class(x)
 def unregister():
     bpy.utils.unregister_class(gyes_panel)
     bpy.utils.unregister_class(gyes_random_material)
@@ -804,6 +927,8 @@ def unregister():
     bpy.utils.unregister_class(history_first)
     bpy.utils.unregister_class(history_last)
     bpy.utils.unregister_class(restore_history)
+    bpy.utils.unregister_class(animate)
+    bpy.utils.unregister_class(x)
     
 if __name__ == '__main__':
     register()
