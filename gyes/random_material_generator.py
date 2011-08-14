@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # first we import all the required modules
-from code import InteractiveConsole
+
 import bpy ,random , copy 
 from bpy.props import *
 import textwrap
@@ -60,6 +60,71 @@ class random_material_class:
         if hasattr(bpy.context.scene , "historybak")==False:
             bpy.types.Scene.historybak = StringProperty()
             print("created history backup")
+            
+         # non read only material properties where keyframes can be inserted or removed
+        self.animated_properties=["alpha",
+        "ambient",
+        "darkness",
+        "diffuse_color",
+        "diffuse_fresnel",
+        "diffuse_fresnel_factor",
+        "diffuse_intensity",
+        "diffuse_ramp_blend",
+        "diffuse_ramp_factor",
+        "diffuse_ramp_input",
+        "diffuse_shader",
+        "diffuse_toon_size",
+        "diffuse_toon_smooth",
+        "emit",
+        "invert_z",
+        "mirror_color",
+        "offset_z",
+        "preview_render_type",
+        "roughness",
+        "shadow_buffer_bias",
+        "shadow_cast_alpha",
+        "shadow_only_type",
+        "shadow_ray_bias",
+        "specular_alpha",
+        "specular_color",
+        "specular_hardness",
+        "specular_intensity",
+        "specular_ior",
+        "specular_ramp_blend",
+        "specular_ramp_factor",
+        "specular_ramp_input",
+        "specular_shader",
+        "specular_slope",
+        "specular_toon_size",
+        "specular_toon_smooth",
+        "translucency",
+        "transparency_method",
+        "type",
+        "use_cast_approximate",
+        "use_cast_buffer_shadows",
+        "use_cast_shadows_only",
+        "use_cubic",
+        "use_diffuse_ramp",
+        "use_face_texture",
+        "use_face_texture_alpha",
+        "use_full_oversampling",
+        "use_light_group_exclusive",
+        "use_mist",
+        "use_nodes",
+        "use_object_color",
+        "use_only_shadow",
+        "use_ray_shadow_bias",
+        "use_raytrace",
+        "use_shadeless",
+        "use_shadows",
+        "use_sky",
+        "use_specular_ramp",
+        "use_tangent_shading",
+        "use_textures",
+        "use_transparency",
+        "use_transparent_shadows",
+        "use_vertex_color_paint"]
+            
         
     # compute randomisation based on the general or specific percentage chosen
     # if the specific percentage is zero then the general percentage is used
@@ -363,7 +428,7 @@ class random_material_class:
                         mat.diffuse_ramp.elements[el].color[3] = self.rm_history[index]["diffuse_ramp"][el]["color"][3]
                         mat.diffuse_ramp.elements[el].position = self.rm_history[index]["diffuse_ramp"][el]["position"]
                     
-                    if self.rm_history[history_index]["use_nodes"]:
+                    if self.rm_history[index]["use_nodes"]:
                         # activate node tree nodes
                         
                         nt = mat.node_tree
@@ -491,27 +556,33 @@ class gyes_panel(bpy.types.Panel):
                     
         if context.scene.gui_mode== 'help' :
             box = layout.box()
-            help_text={0:"",1:"Copyright 2011 Kilon  ",    
-            2:"Random Material  Generator Gyes ",
-            3:"A tool that generates random materials.",
-            4:"",
-            5:"Simple Mode",
-            6:"--------------------------",
-            7:"In this mode you can do basic randomisation. Choose parameters you want to randomise by turning them on or off with clicking on them. Hit the random button when you are ready. Each time you hit the button the new random material is stored in a history index",
-            8:"",
-            9:"History",
-            10:"--------------------------",
-            11:"history index -> choose index",
-            12:"previous -> previous index (activate)",
-            13:"next -> next index (activate)",
-            14:"activate -> use this index as active material",
-            15:"delete -> delete this index",
-            16:"del start -> start deletion from here",
-            17:"del end -> end deletion here",
-            18:"",
-            19:"Percentage",
-            20:"--------------------------",
-            21:"Percentage randomisation means that the parameter is randomised inside a range of percentage of the full range of the value. When a specific percentage is zero, the general percentage is used instead for that area. When a specific percentage is not zero then general percentage is ignored and specific percentage is used instead. If you dont want to randomise that area at all, in Simple Mode use the corresponding button to completely disable that area , the percentage slider will also be disable in the percentage mode. Randomisation takes always the current value as starting point so the next randomisation will use the current randomised value. Randomisation is always 50% of the specific percentage bellow the current value and 50% above . If the percentage exceeed minimum and maximum values of the full range, then it will default to minimum and maximum accordingly. "}
+            help_text=["","Copyright 2011 Kilon  ",    
+            "Random Material  Generator Gyes ",
+            "A tool that generates random materials.",
+            "",
+            "Simple Mode",
+            "--------------------------",
+            "In this mode you can do basic randomisation. Choose parameters you want to randomise by turning them on or off with clicking on them. Hit the random button when you are ready. Each time you hit the button the new random material is stored in a history index",
+            "",
+            "History",
+            "--------------------------",
+            "History index -> choose index",
+            "( < ) -> Previous index (activate)",
+            "( > ) -> Next index (activate)",
+            "( |< ) -> First history index",
+            "( >| ) -> Last history index",
+            "Activate -> use this index as active material",
+            "Animate -> Insert a keyframe in the current frame for every singly non read only material property",
+            "X -> Remove a keyframe in the current frame for every singly non read only material property",
+            "R -> works just like activate but instead of using the current selected index use a randomly selected one",
+            "Delete -> delete this index",
+            "Del start -> start deletion from here",
+            "Del end -> end deletion here",
+            "Restore -> restores history from the saved blend file",
+            "",
+            "Percentage",
+            "--------------------------",
+            "Percentage randomisation means that the parameter is randomised inside a range of percentage of the full range of the value. When a specific percentage is zero, the general percentage is used instead for that area. When a specific percentage is not zero then general percentage is ignored and specific percentage is used instead. If you dont want to randomise that area at all, in Simple Mode use the corresponding button to completely disable that area , the percentage slider will also be disable in the percentage mode. Randomisation takes always the current value as starting point so the next randomisation will use the current randomised value. Randomisation is always 50% of the specific percentage bellow the current value and 50% above . If the percentage exceeed minimum and maximum values of the full range, then it will default to minimum and maximum accordingly. "]
             w=bpy.context.scene.text_width
             box.prop(context.scene,"text_width", slider =True)
             rm.multi_label(help_text,box,w) 
@@ -586,7 +657,6 @@ class history_first(bpy.types.Operator):
         rm.activate()
         
         return{'FINISHED'}
-
 
 # Move to the previous hisory index and activate it
 class history_previous(bpy.types.Operator):
@@ -674,8 +744,7 @@ class store_to_history(bpy.types.Operator):
     def execute(self, context):
         mat = context.selected_objects[0].active_material
         rm.store_to_history(mat)
-         
-        
+                 
         return{'FINISHED'}
 
 # Delete selected history index from history
@@ -748,71 +817,9 @@ class animate(bpy.types.Operator):
         for i in range(0,len(bpy.context.selected_objects)):
             mat = bpy.context.selected_objects[i].active_material
             
-            animated_attributes=["alpha",
-            "ambient",
-            "darkness",
-            "diffuse_color",
-            "diffuse_fresnel",
-            "diffuse_fresnel_factor",
-            "diffuse_intensity",
-            "diffuse_ramp_blend",
-            "diffuse_ramp_factor",
-            "diffuse_ramp_input",
-            "diffuse_shader",
-            "diffuse_toon_size",
-            "diffuse_toon_smooth",
-            "emit",
-            "invert_z",
-            "mirror_color",
-            "offset_z",
-            "preview_render_type",
-            "roughness",
-            "shadow_buffer_bias",
-            "shadow_cast_alpha",
-            "shadow_only_type",
-            "shadow_ray_bias",
-            "specular_alpha",
-            "specular_color",
-            "specular_hardness",
-            "specular_intensity",
-            "specular_ior",
-            "specular_ramp_blend",
-            "specular_ramp_factor",
-            "specular_ramp_input",
-            "specular_shader",
-            "specular_slope",
-            "specular_toon_size",
-            "specular_toon_smooth",
-            "translucency",
-            "transparency_method",
-            "type",
-            "use_cast_approximate",
-            "use_cast_buffer_shadows",
-            "use_cast_shadows_only",
-            "use_cubic",
-            "use_diffuse_ramp",
-            "use_face_texture",
-            "use_face_texture_alpha",
-            "use_full_oversampling",
-            "use_light_group_exclusive",
-            "use_mist",
-            "use_nodes",
-            "use_object_color",
-            "use_only_shadow",
-            "use_ray_shadow_bias",
-            "use_raytrace",
-            "use_shadeless",
-            "use_shadows",
-            "use_sky",
-            "use_specular_ramp",
-            "use_tangent_shading",
-            "use_textures",
-            "use_transparency",
-            "use_transparent_shadows",
-            "use_vertex_color_paint"]
             
-            for y in range(0,len(animated_attributes)):
-                mat.keyframe_insert(data_path = animated_attributes[y], frame = framen)
+            for y in range(0,len(rm.animated_properties)):
+                mat.keyframe_insert(data_path = rm.animated_properties[y], frame = framen)
         
         return{'FINISHED'}
  
@@ -828,71 +835,8 @@ class x(bpy.types.Operator):
         for i in range(0,len(bpy.context.selected_objects)):
             mat = bpy.context.selected_objects[i].active_material
             
-            animated_attributes=["alpha",
-            "ambient",
-            "darkness",
-            "diffuse_color",
-            "diffuse_fresnel",
-            "diffuse_fresnel_factor",
-            "diffuse_intensity",
-            "diffuse_ramp_blend",
-            "diffuse_ramp_factor",
-            "diffuse_ramp_input",
-            "diffuse_shader",
-            "diffuse_toon_size",
-            "diffuse_toon_smooth",
-            "emit",
-            "invert_z",
-            "mirror_color",
-            "offset_z",
-            "preview_render_type",
-            "roughness",
-            "shadow_buffer_bias",
-            "shadow_cast_alpha",
-            "shadow_only_type",
-            "shadow_ray_bias",
-            "specular_alpha",
-            "specular_color",
-            "specular_hardness",
-            "specular_intensity",
-            "specular_ior",
-            "specular_ramp_blend",
-            "specular_ramp_factor",
-            "specular_ramp_input",
-            "specular_shader",
-            "specular_slope",
-            "specular_toon_size",
-            "specular_toon_smooth",
-            "translucency",
-            "transparency_method",
-            "type",
-            "use_cast_approximate",
-            "use_cast_buffer_shadows",
-            "use_cast_shadows_only",
-            "use_cubic",
-            "use_diffuse_ramp",
-            "use_face_texture",
-            "use_face_texture_alpha",
-            "use_full_oversampling",
-            "use_light_group_exclusive",
-            "use_mist",
-            "use_nodes",
-            "use_object_color",
-            "use_only_shadow",
-            "use_ray_shadow_bias",
-            "use_raytrace",
-            "use_shadeless",
-            "use_shadows",
-            "use_sky",
-            "use_specular_ramp",
-            "use_tangent_shading",
-            "use_textures",
-            "use_transparency",
-            "use_transparent_shadows",
-            "use_vertex_color_paint"]
-            
-            for y in range(0,len(animated_attributes)):
-                mat.keyframe_delete(data_path = animated_attributes[y], frame = framen)
+            for y in range(0,len(rm.animated_properties)):
+                mat.keyframe_delete(data_path = rm.animated_properties[y], frame = framen)
         
         return{'FINISHED'}
          
