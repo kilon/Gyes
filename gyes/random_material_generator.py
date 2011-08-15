@@ -163,8 +163,7 @@ class random_material_class:
     def random_material(self,active_material,name):
         mat = active_material
         scn = bpy.context.scene
-        scn.history_index =len(self.rm_history)+1
-        
+             
         #checks that the user has allowed the randomisation of that specific parameter            
         if scn.rdiffuse_color:
             rand_perc = scn.rdiffuse_color_percentage
@@ -218,108 +217,10 @@ class random_material_class:
     def store_to_history(self, mat):
         scn = bpy.context.scene
         history_index = scn.history_index
-        self.rm_history[history_index]= {"diffuse_color" : tuple(mat.diffuse_color),
-          "alpha" : mat.alpha ,
-          "ambient" : mat.ambient ,
-          "darkness": mat.darkness,
-          "diffuse_color": tuple(mat.diffuse_color),
-          "diffuse_fresnel" : mat.diffuse_fresnel,
-          "diffuse_fresnel_factor" : mat.diffuse_fresnel_factor, 
-          "diffuse_intensity" : mat.diffuse_intensity ,
-          "diffuse_ramp_blend" : mat.diffuse_ramp_blend,
-          "diffuse_ramp_factor": mat.diffuse_ramp_factor,
-          "diffuse_ramp_input" : mat.diffuse_ramp_input,
-          "diffuse_shader" : mat.diffuse_shader , 
-          "diffuse_toon_size" : mat.diffuse_toon_size,
-          "diffuse_toon_smooth" : mat.diffuse_toon_smooth,
-          "emit" : mat.emit,
-          "invert_z" : mat.invert_z,
-          "mirror_color" : tuple(mat.mirror_color),
-          "offset_z" : mat.offset_z ,
-          "preview_render_type" : mat.preview_render_type,
-          "roughness" : mat.roughness,
-          "shadow_buffer_bias" : mat.shadow_buffer_bias,
-          "shadow_cast_alpha" : mat.shadow_cast_alpha , 
-          "shadow_only_type" : mat.shadow_only_type ,
-          "shadow_ray_bias" : mat.shadow_ray_bias ,
-          "specular_alpha" : mat.specular_alpha ,
-          "specular_color" : tuple(mat.specular_color) , 
-          "specular_hardness" : mat.specular_hardness , 
-          "specular_intensity" : mat.specular_intensity , 
-          "specular_ior" : mat.specular_ior,
-          "specular_ramp_blend" : mat.specular_ramp_blend, 
-          "specular_ramp_factor" : mat.specular_ramp_factor,
-          "specular_ramp_input" :  mat.specular_ramp_input,
-          "specular_shader" : mat.specular_shader ,
-          "specular_slope" : mat.specular_slope,
-          "specular_toon_size" : mat.specular_toon_size , 
-          "specular_toon_smooth" : mat.specular_toon_smooth,
-          "translucency" : mat.translucency , 
-          "transparency_method" : mat.transparency_method,
-          "type" : mat.type, 
-          "use_cast_approximate" : mat.use_cast_approximate,
-          "use_cast_buffer_shadows" : mat.use_cast_buffer_shadows,
-          "use_cast_shadows_only" : mat.use_cast_shadows_only,
-          "use_cubic" : mat.use_cubic,
-          "use_diffuse_ramp" : mat.use_diffuse_ramp,
-          "use_face_texture" : mat.use_face_texture,
-          "use_face_texture_alpha" : mat.use_face_texture_alpha,
-          "use_full_oversampling" : mat.use_full_oversampling,
-          "use_light_group_exclusive" : mat.use_light_group_exclusive,
-          "use_mist" : mat.use_mist,
-          "use_nodes" : mat.use_nodes,
-          "use_object_color" : mat.use_object_color,
-          "use_only_shadow" : mat.use_only_shadow,
-          "use_ray_shadow_bias" : mat.use_ray_shadow_bias,
-          "use_raytrace" : mat.use_raytrace,
-          "use_shadeless" :mat.use_shadeless,
-          "use_shadows" : mat.use_shadows,
-          "use_sky" : mat.use_sky,
-          "use_specular_ramp" : mat.use_specular_ramp,
-          "use_tangent_shading" : mat.use_tangent_shading,
-          "use_textures" : mat.use_textures,
-          "use_transparency" : mat.use_transparency , 
-          "use_transparent_shadows" : mat.use_transparent_shadows,
-          "use_vertex_color_paint" : mat.use_transparent_shadows} 
-          
-        # diffuse ramp
-        if self.rm_history[history_index]["use_diffuse_ramp"]:
-            self.rm_history[history_index]["diffuse_ramp"]={}
-            for el in range(0,len(mat.diffuse_ramp.elements)):
-                self.rm_history[history_index]["diffuse_ramp"].update({el:{"color":{0: mat.diffuse_ramp.elements[el].color[0] ,
-                1: mat.diffuse_ramp.elements[el].color[1],
-                2: mat.diffuse_ramp.elements[el].color[2],
-                3: mat.diffuse_ramp.elements[el].color[3]},"position": mat.diffuse_ramp.elements[el].position}})
-           
-        # node_tree
-        
-        nt = mat.node_tree
-        self.rm_history[history_index].update({"node_tree":{}})
-            
-        #store each node of the node tree to history 
-        if self.rm_history[history_index]["use_nodes"]:
-            
-            self.rm_history[history_index]["node_tree"].update({"nodes":{}})
-            for x in range(0,len(nt.nodes)):
-                self.rm_history[history_index]["node_tree"]["nodes"].update({x:{"name": nt.nodes[x].name , 
-                "pos_x": nt.nodes[x].location[0] ,
-                "pos_y": nt.nodes[x].location[1] ,
-                "type" : nt.nodes[x].type }})
-                
-                
-            #store each node link to history
-            self.rm_history[history_index]["node_tree"].update({"links":{}})
-            for x in range(0,len(nt.links)):     
-                self.rm_history[history_index]["node_tree"]["links"].update({x:{"from_node": nt.links[x].from_node.name , 
-                "to_node": nt.links[x].to_node.name ,
-                "from_socket": nt.links[x].from_socket.name ,
-                "to_socket" : nt.links[x].to_socket.name }}) 
-        
-        # Texture
-           
-        print("node_tree : ",self.rm_history[history_index]["node_tree"])
-        
-                    
+        self.rm_history[history_index]= {"name" : mat.name} 
+        print("mat stored : "+self.rm_history[history_index]["name"])
+        mat.use_fake_user = True
+                 
         bpy.context.scene.historybak = str(self.rm_history)
         
     # Activate. Make active material the particular history index the user has chosen
@@ -340,123 +241,34 @@ class random_material_class:
                     
                 scn = bpy.context.scene
                 mat = i.active_material
-                scn.history_index=index    
-                         
-            mat.alpha = self.rm_history[index]["alpha"]
-            mat.ambient = self.rm_history[index]["ambient"]
-            mat.darkness = self.rm_history[index]["darkness"]
-            mat.diffuse_color = self.rm_history[index]["diffuse_color"]
-            mat.diffuse_fresnel = self.rm_history[index]["diffuse_fresnel"]
-            mat.diffuse_fresnel_factor = self.rm_history[index]["diffuse_fresnel_factor"]
-            mat.diffuse_intensity = self.rm_history[index]["diffuse_intensity"]
-            mat.diffuse_ramp_blend = self.rm_history[index]["diffuse_ramp_blend"]
-            mat.diffuse_ramp_factor = self.rm_history[index]["diffuse_ramp_factor"]
-            mat.diffuse_ramp_input = self.rm_history[index]["diffuse_ramp_input"]
-            mat.diffuse_shader = self.rm_history[index]["diffuse_shader"]
-            mat.diffuse_toon_size = self.rm_history[index]["diffuse_toon_size"]
-            mat.diffuse_toon_smooth = self.rm_history[index]["diffuse_toon_smooth"]
-            mat.emit = self.rm_history[index]["emit"]
-            mat.invert_z = self.rm_history[index]["invert_z"]
-            mat.mirror_color = self.rm_history[index]["mirror_color"]
-            mat.offset_z = self.rm_history[index]["offset_z"]
-            mat.preview_render_type = self.rm_history[index]["preview_render_type"]
-            mat.roughness = self.rm_history[index]["roughness"]
-            mat.shadow_buffer_bias = self.rm_history[index]["shadow_buffer_bias"]
-            mat.shadow_cast_alpha = self.rm_history[index]["shadow_cast_alpha"]
-            mat.shadow_only_type = self.rm_history[index]["shadow_only_type"]
-            mat.shadow_ray_bias = self.rm_history[index]["shadow_ray_bias"]
-            mat.specular_alpha = self.rm_history[index]["specular_alpha"]
-            mat.specular_color = self.rm_history[index]["specular_color"]
-            mat.specular_hardness = self.rm_history[index]["specular_hardness"]
-            mat.specular_intensity = self.rm_history[index]["specular_intensity"]
-            mat.specular_ior = self.rm_history[index]["specular_ior"]
-            mat.specular_ramp_blend = self.rm_history[index]["specular_ramp_blend"]
-            mat.specular_ramp_factor = self.rm_history[index]["specular_ramp_factor"]
-            mat.specular_ramp_input = self.rm_history[index]["specular_ramp_input"]
-            mat.specular_shader = self.rm_history[index]["specular_shader"]
-            mat.specular_slope = self.rm_history[index]["specular_slope"]
-            mat.specular_toon_size = self.rm_history[index]["specular_toon_size"]
-            mat.specular_toon_smooth = self.rm_history[index]["specular_toon_smooth"]
-            mat.translucency = self.rm_history[index]["translucency"] 
-            mat.transparency_method = self.rm_history[index]["transparency_method"]
-            mat.type = self.rm_history[index]["type"] 
-            mat.use_cast_approximate = self.rm_history[index]["use_cast_approximate"]
-            mat.use_cast_buffer_shadows = self.rm_history[index]["use_cast_buffer_shadows"]          
-            mat.use_cast_shadows_only = self.rm_history[index]["use_cast_shadows_only"]
-            mat.use_cubic = self.rm_history[index]["use_cubic"] 
-            mat.use_diffuse_ramp = self.rm_history[index]["use_diffuse_ramp"]
-            mat.use_face_texture = self.rm_history[index]["use_face_texture"]
-            mat.use_face_texture_alpha = self.rm_history[index]["use_face_texture_alpha"]
-            mat.use_full_oversampling = self.rm_history[index]["use_full_oversampling"] 
-            mat.use_light_group_exclusive = self.rm_history[index]["use_light_group_exclusive"]
-            mat.use_mist = self.rm_history[index]["use_mist"] 
-            mat.use_nodes = self.rm_history[index]["use_nodes"]
-            mat.use_object_color = self.rm_history[index]["use_object_color"]
-            mat.use_only_shadow = self.rm_history[index]["use_only_shadow"]
-            mat.use_ray_shadow_bias = self.rm_history[index]["use_ray_shadow_bias"]
-            mat.use_raytrace = self.rm_history[index]["use_raytrace"]
-            mat.use_shadeless = self.rm_history[index]["use_shadeless"]
-            mat.use_shadows = self.rm_history[index]["use_shadows"] 
-            mat.use_sky = self.rm_history[index]["use_sky"]
-            mat.use_specular_ramp = self.rm_history[index]["use_specular_ramp"]
-            mat.use_tangent_shading = self.rm_history[index]["use_tangent_shading"]
-            mat.use_textures = self.rm_history[index]["use_textures"]
-            mat.use_transparency = self.rm_history[index]["use_transparency"]
-            mat.use_transparent_shadows = self.rm_history[index]["use_transparent_shadows"]
-            mat.use_transparent_shadows = self.rm_history[index]["use_vertex_color_paint"]
-            
-            # activate the diffuse ramp
-            if self.rm_history[index]["use_diffuse_ramp"]:
+                scn.history_index=index
                 
-                while len(mat.diffuse_ramp.elements)>1:
-                    ele = mat.diffuse_ramp.elements[-1]
-                    mat.diffuse_ramp.elements.remove(ele)
-                for el in range(0, len(self.rm_history[index]["diffuse_ramp"])):
-                     
-                    if el==0 :
-                        
-                        mat.diffuse_ramp.elements[el].color[0] = self.rm_history[index]["diffuse_ramp"][el]["color"][0]
-                        mat.diffuse_ramp.elements[el].color[1] = self.rm_history[index]["diffuse_ramp"][el]["color"][1]
-                        mat.diffuse_ramp.elements[el].color[2] = self.rm_history[index]["diffuse_ramp"][el]["color"][2]
-                        mat.diffuse_ramp.elements[el].color[3] = self.rm_history[index]["diffuse_ramp"][el]["color"][3]
-                        mat.diffuse_ramp.elements[el].position = self.rm_history[index]["diffuse_ramp"][el]["position"]
-                    else :
-                        mat.diffuse_ramp.elements.new(el)
-                        mat.diffuse_ramp.elements[el].color[0] = self.rm_history[index]["diffuse_ramp"][el]["color"][0]
-                        mat.diffuse_ramp.elements[el].color[1] = self.rm_history[index]["diffuse_ramp"][el]["color"][1]
-                        mat.diffuse_ramp.elements[el].color[2] = self.rm_history[index]["diffuse_ramp"][el]["color"][2]
-                        mat.diffuse_ramp.elements[el].color[3] = self.rm_history[index]["diffuse_ramp"][el]["color"][3]
-                        mat.diffuse_ramp.elements[el].position = self.rm_history[index]["diffuse_ramp"][el]["position"]
+            material_slots_backup =[]    
+            material_slots_len = len(i.material_slots)
+            
+            for x in range(0,material_slots_len):
+                print("x = ",x)
+                if x==0:
+                    print("appending stored material")
+                    i.active_material_index=material_slots_len-1
+                    i.data.materials.append(bpy.data.materials[self.rm_history[index]["name"]])
+                    i.active_material_index=0
+                    bpy.ops.object.material_slot_remove()
+                
+                else:
+                    print("deleting materials")
+                    i.active_material_index=0
+                    material_slots_backup.append(i.material_slots[0].material.name)
+                    print("backup : "+i.material_slots[0].material.name)
+                    bpy.ops.object.material_slot_remove()
                     
-                    if self.rm_history[index]["use_nodes"]:
-                        # activate node tree nodes
-                        
-                        nt = mat.node_tree
-                        
-                        #first remove any existent nodes to replace them with new ones
-                        for x in range(0,len(nt.nodes)):
-                            nt.nodes.remove(nt.nodes[-1])
-                            
-                        # now set the new nodes
-                        
-                        for x in range(0, len(self.rm_history[index]["node_tree"]["nodes"])):
-                            
-                            nt.nodes.new(self.rm_history[index]["node_tree"]["nodes"][x]["type"])
-                            nt.nodes[x].name = self.rm_history[index]["node_tree"]["nodes"][x]["name"]
-                            nt.nodes[x].location[0] = self.rm_history[index]["node_tree"]["nodes"][x]["pos_x"]
-                            nt.nodes[x].location[1] = self.rm_history[index]["node_tree"]["nodes"][x]["pos_y"]
-                            print(nt.nodes[x].name)
-                        
-                        for x in range(0, len(self.rm_history[index]["node_tree"]["links"])):
-                            
-                            node_name_source = self.rm_history[index]["node_tree"]["links"][x]["from_node"]
-                            node_name_destination = self.rm_history[index]["node_tree"]["links"][x]["to_node"]
-                            socket_name_source = self.rm_history[index]["node_tree"]["links"][x]["from_socket"]
-                            socket_name_destination = self.rm_history[index]["node_tree"]["links"][x]["to_socket"]
-                            
-                            print("trying to connect node["+node_name_source+"] socket ["+socket_name_source+"] with node["+node_name_destination+"] socket["+socket_name_destination+"]")
-                            nt.links.new(nt.nodes[node_name_source].outputs[socket_name_source],nt.nodes[node_name_destination].inputs[socket_name_destination])
-    
+            
+            i.active_material_index=0
+            for y in range(0,len(material_slots_backup)):
+                i.active_material_index=y
+                i.data.materials.append(bpy.data.materials[material_slots_backup[y]])
+            i.active_material_index=0
+                   
     # a nice multi label                        
     def multi_label(self, text, ui,text_width):
         
@@ -466,10 +278,7 @@ class random_material_class:
             for y in range(0,len(el)):
                 print("text : "+el[y])
                 ui.label(text=el[y])
-                                
-                        
-                        
-     
+                                     
 # create the instance class for randomisation   
 rm = random_material_class()
                 
@@ -586,9 +395,7 @@ class gyes_panel(bpy.types.Panel):
             w=bpy.context.scene.text_width
             box.prop(context.scene,"text_width", slider =True)
             rm.multi_label(help_text,box,w) 
-           
-           
-                       
+                                
         # Display the History Gui for all modes
         
         layout.label(text="History")
@@ -604,15 +411,11 @@ class gyes_panel(bpy.types.Panel):
         if rm_index in rm.rm_history and rm.rm_history[rm_index] :
             row = history_box.row()
             a = row.split(percentage = 0.3, align = True)
-           
             a.operator("gyes.activate")
             a.operator("gyes.animate")
             b=a.split(percentage = 0.3, align = True)
             b.operator("gyes.x")
-            b.operator("gyes.random_activate")
-            
-            
-            
+            b.operator("gyes.random_activate")                       
         else:
             history_box.label(text= "Empty Index ! ")
         
@@ -620,11 +423,13 @@ class gyes_panel(bpy.types.Panel):
             history_box.operator("gyes.store")
         else:
             history_box.label(text= "Not the first Empty Index")
+            
         if rm_index in rm.rm_history and rm.rm_history[rm_index] :
             history_box.operator("gyes.delete")
             row2 = history_box.row()
             row2.operator("gyes.delete_start")
             row2.operator("gyes.delete_end")
+            
         if hasattr(bpy.context.scene,"historybak") and bpy.context.scene.historybak!='':
             history_box.operator("gyes.restore")
         else:
@@ -641,7 +446,6 @@ class gyes_random_material(bpy.types.Operator):
     def execute(self, context):
         for i in context.selected_objects :
             if i.type == 'MESH' :
-            
                 rm.random_material(i.active_material,'Random')
         return{'FINISHED'}
 
@@ -816,8 +620,7 @@ class animate(bpy.types.Operator):
         framen = bpy.context.scene.frame_current
         for i in range(0,len(bpy.context.selected_objects)):
             mat = bpy.context.selected_objects[i].active_material
-            
-            
+                        
             for y in range(0,len(rm.animated_properties)):
                 mat.keyframe_insert(data_path = rm.animated_properties[y], frame = framen)
         
