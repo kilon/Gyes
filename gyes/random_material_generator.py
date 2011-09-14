@@ -276,26 +276,10 @@ class random_material_class:
             el = textwrap.wrap(text[x], width = text_width)
             
             for y in range(0,len(el)):
-                print("text : "+el[y])
                 ui.label(text=el[y])
-                                     
-# create the instance class for randomisation   
-rm = random_material_class()
                 
-# this the main panel
-class gyes_panel(bpy.types.Panel):
-    bl_label = "Gyes"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
-    
-    @classmethod    
-    def poll(self, context):
-        if context.object and context.object.type == 'MESH':                    
-            return len(context.object.data.materials)
-        
-    def draw(self, context):
-        
-        layout = self.layout
+    def draw_gui(self ,panel):
+        layout = panel.layout
         row = layout.row()
         row.prop(context.scene , "gui_mode" )
         
@@ -365,8 +349,9 @@ class gyes_panel(bpy.types.Panel):
                     
         if context.scene.gui_mode== 'help' :
             box = layout.box()
-            help_text=["","Copyright 2011 Kilon  ",    
-            "Random Material  Generator Gyes ",
+            help_text=["","Copyright 2011 Kilon  ",
+            "GYES - RGM",    
+            "Random Material  Generator",
             "A tool that generates random materials.",
             "",
             "Simple Mode",
@@ -433,7 +418,10 @@ class gyes_panel(bpy.types.Panel):
         if hasattr(bpy.context.scene,"historybak") and bpy.context.scene.historybak!='':
             history_box.operator("gyes.restore")
         else:
-            history_box.label(text="Backup not Found")    
+            history_box.label(text="Backup not Found")
+                                     
+
+            
         
 # Generate the random material button
 class gyes_random_material(bpy.types.Operator):

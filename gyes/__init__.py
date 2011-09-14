@@ -35,9 +35,31 @@ bl_info = {
 if "bpy" in locals():
     import imp
     imp.reload(random_material_generator)
+    #imp.reload(random_landscape_generator)
 else:
     from gyes import random_material_generator
+    #from gyes import random_landscape_generator
+    
 import bpy
+
+# create the instance class for randomisation   
+rm = random_material_generator.random_material_class()
+                
+# this the main panel
+class gyes_panel(bpy.types.Panel):
+    bl_label = "Gyes - RGM "
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "TOOLS"
+    
+    @classmethod    
+    def poll(self, context):
+        if context.object and context.object.type == 'MESH':                    
+            return len(context.object.data.materials)
+        
+    
+    def draw(self, context):
+        rm.draw_gui(self)
+        
 def register():
     bpy.utils.register_module(__name__)
 
