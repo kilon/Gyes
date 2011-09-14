@@ -46,9 +46,9 @@ from bpy.props import *
 
 # Choose the tool you want to use
 bpy.types.Scene.tool = EnumProperty(attr='tool', name='Tool', items=(
-('RGM', 'RGM', 'Random Material Generator'),
+('RMG', 'RMG', 'Random Material Generator'),
 ('RLG', 'RLG' , 'Random Landscape Generator'),
-('TARTARA', 'TARTARA', 'An online Library for any kind of blender asset')), default='RGM')
+('TARTARA', 'TARTARA', 'An online Library for any kind of blender asset')),default='RMG')
 
 
 rm = random_material_generator.rm                 
@@ -71,7 +71,7 @@ class gyes_panel(bpy.types.Panel):
         
         # check which tool the user has selected (RGM is the default one) and display the appropriate gui
         
-        if context.scene.tool == 'RGM' :
+        if context.scene.tool == 'RMG' :
             rm.draw_gui(context,self)
         r = layout.row()
         if context.scene.tool == 'RLG' :
