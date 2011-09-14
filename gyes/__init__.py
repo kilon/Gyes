@@ -54,14 +54,14 @@ bpy.types.Scene.tool = EnumProperty(attr='tool', name='Tool', items=(
 rm = random_material_generator.rm                 
 # this the main panel
 class gyes_panel(bpy.types.Panel):
-    bl_label = "Gyes - RGM "
+    bl_label = "Gyes"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     
-    @classmethod    
+    """@classmethod    
     def poll(self, context):
         if context.object and context.object.type == 'MESH':                    
-            return len(context.object.data.materials)
+            return len(context.object.data.materials)"""
         
     
     def draw(self, context):

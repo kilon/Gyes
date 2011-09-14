@@ -431,7 +431,24 @@ class gyes_random_material(bpy.types.Operator):
     def execute(self, context):
         for i in context.selected_objects :
             if i.type == 'MESH' :
-                rm.random_material(i.active_material,'Random')
+
+                if not i.material_slots:
+                    print("no material_slot found , creating new with material")
+                    new_random = bpy.data.materials.new("Random")
+                    i.active_material=new_random
+                    rm.random_material(i.active_material,'Random')
+
+
+                if i.material_slots[0].material:
+                    print("found an existing material, using this one ")
+                    rm.random_material(i.active_material,'Random')
+
+                if not i.material_slots[0].material:
+                    print("no material found , creating new")
+                    new_random = bpy.data.materials.new("Random")
+                    i.active_material=new_random
+                    rm.random_material(i.active_material,'Random')
+
         return{'FINISHED'}
 
 # Move to the first history index and activate it
