@@ -17,12 +17,7 @@ class random_material_class:
 ('simple_percentage', 'Simple percentage' , 'here you define individual percentage'),
 ('templates', 'Templates', 'The second item'),
 ('help', 'Help', 'The third item')), default='simple')
-        self.weirdprop = EnumProperty(attr='mode', name='Mode', items=(
-('simple', 'Simple', 'The first item'),
-('simple_percentage', 'Simple percentage' , 'here you define individual percentage'),
-('templates', 'Templates', 'The second item'),
-('help', 'Help', 'The third item')), default='simple')
-       
+
         # Here I define the selective areas that the user can enable or disable for randomisation in simple mode               
                      
         bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Enable/Disable Randomisation for the  Diffuse Shader " , default = True)
