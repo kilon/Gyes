@@ -278,7 +278,7 @@ class random_material_class:
             for y in range(0,len(el)):
                 ui.label(text=el[y])
                 
-    def draw_gui(self ,panel):
+    def draw_gui(self ,context,panel):
         layout = panel.layout
         row = layout.row()
         row.prop(context.scene , "gui_mode" )
@@ -379,7 +379,7 @@ class random_material_class:
             "Percentage randomisation means that the parameter is randomised inside a range of percentage of the full range of the value. When a specific percentage is zero, the general percentage is used instead for that area. When a specific percentage is not zero then general percentage is ignored and specific percentage is used instead. If you dont want to randomise that area at all, in Simple Mode use the corresponding button to completely disable that area , the percentage slider will also be disable in the percentage mode. Randomisation takes always the current value as starting point so the next randomisation will use the current randomised value. Randomisation is always 50% of the specific percentage bellow the current value and 50% above . If the percentage exceeed minimum and maximum values of the full range, then it will default to minimum and maximum accordingly. "]
             w=bpy.context.scene.text_width
             box.prop(context.scene,"text_width", slider =True)
-            rm.multi_label(help_text,box,w) 
+            self.multi_label(help_text,box,w) 
                                 
         # Display the History Gui for all modes
         
@@ -393,7 +393,7 @@ class random_material_class:
         row.operator("gyes.last")
         rm_index = context.scene.history_index
         
-        if rm_index in rm.rm_history and rm.rm_history[rm_index] :
+        if rm_index in self.rm_history and self.rm_history[rm_index] :
             row = history_box.row()
             a = row.split(percentage = 0.3, align = True)
             a.operator("gyes.activate")
@@ -404,12 +404,12 @@ class random_material_class:
         else:
             history_box.label(text= "Empty Index ! ")
         
-        if context.scene.history_index < len(rm.rm_history)+2:
+        if context.scene.history_index < len(self.rm_history)+2:
             history_box.operator("gyes.store")
         else:
             history_box.label(text= "Not the first Empty Index")
             
-        if rm_index in rm.rm_history and rm.rm_history[rm_index] :
+        if rm_index in self.rm_history and self.rm_history[rm_index] :
             history_box.operator("gyes.delete")
             row2 = history_box.row()
             row2.operator("gyes.delete_start")
@@ -420,6 +420,8 @@ class random_material_class:
         else:
             history_box.label(text="Backup not Found")
                                      
+# create the instance class for randomisation   
+rm =random_material_class()
 
             
         

@@ -42,9 +42,7 @@ else:
     
 import bpy
 
-# create the instance class for randomisation   
-rm = random_material_generator.random_material_class()
-                
+rm = random_material_generator.rm                 
 # this the main panel
 class gyes_panel(bpy.types.Panel):
     bl_label = "Gyes - RGM "
@@ -58,7 +56,7 @@ class gyes_panel(bpy.types.Panel):
         
     
     def draw(self, context):
-        rm.draw_gui(self)
+        rm.draw_gui(context,self)
         
 def register():
     bpy.utils.register_module(__name__)
