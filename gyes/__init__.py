@@ -74,10 +74,10 @@ class gyes_panel(bpy.types.Panel):
         if context.scene.tool == 'RGM' :
             rm.draw_gui(context,self)
         r = layout.row()
-        if context.scene.tool == 'RLM' :
-            r.label(text="WIP...")
+        if context.scene.tool == 'RLG' :
+            r.label(text="WIP not finished yet")
         if context.scene.tool == 'TARTARA' :
-            r.label(text="WIP")
+            r.label(text="WIP not finished yet")
 
 
         
