@@ -28,6 +28,7 @@ class random_material_class:
         bpy.types.Scene.rspecular_intensity = BoolProperty(name= "Specular Intensity" ,description = "Enable/Disable Randomisation for the Specular Intensity" , default = True)
         bpy.types.Scene.rspecular_hardness = BoolProperty(name= "Specular Hardness" ,description = "Enable/Disable Randomisation for the Specular Hardness" , default = True)
         bpy.types.Scene.rtransparency = BoolProperty(name= "Transparency" ,description = "Use and Randomise Transparency" , default = True)
+        bpy.types.Scene.rtexture = BoolProperty(name= "Texture" ,description = "Use and Randomise Textures" , default = True)
         
         # Percentage randomisation
         bpy.types.Scene.general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
@@ -290,6 +291,8 @@ class random_material_class:
             box.prop(context.scene,"rspecular_intensity", toggle = True)
             box.prop(context.scene,"rspecular_hardness", toggle = True)
             box.prop(context.scene,"rtransparency", toggle = True)
+            box.prop(context.scene,"rtexture", toggle = True)
+            
             box.prop(context.scene,"general_percentage", slider = True)           
             layout.operator("gyes.random_material")
             
