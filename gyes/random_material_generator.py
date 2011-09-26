@@ -201,6 +201,9 @@ class random_material_class:
             if mat.transparency_method == 'Z_TRANSPARENCY' :
                 bing =0     # dummy code
                 mat.specular_alpha= random.random()
+        
+        if scn.rtexture :
+            self.random_textures(mat)
      
         mat.ambient = self.compute_percentage(0,1, mat.ambient, scn.general_percentage)
         
@@ -208,7 +211,11 @@ class random_material_class:
         self.store_to_history(mat)
           
         return mat
-    
+
+    # randomise textures
+    def random_textures(self,mat):
+        print("randomising textures")
+  
     #store active material to history
     def store_to_history(self, mat):
         scn = bpy.context.scene
