@@ -1,0 +1,573 @@
+# -*- coding: UTF-8 -*-
+# first we import all the required modules
+
+import bpy ,random , copy 
+from bpy.props import *
+import textwrap
+
+class random_texture_class:
+    """ this class contains all fuctions and variables concerning generation of random material """
+    
+    def __init__(self):
+        """ several fuctions can be found here . All options for random generation . The History dictionary and several others."""
+                   
+        # various gui modes (simple, template etc)
+        bpy.types.Scene.gui_mode = EnumProperty(attr='mode', name='Mode', items=(
+('simple', 'Simple', 'The first item'),
+('simple_percentage', 'Simple percentage' , 'here you define individual percentage'),
+('templates', 'Templates', 'The second item'),
+('help', 'Help', 'The third item')), default='simple')
+
+        # Here I define the selective areas that the user can enable or disable for randomisation in simple mode               
+                     
+        # bpy.types.Scene.rdiffuse_shader = BoolProperty(name= "Diffuse Shader" ,description = "Enable/Disable Randomisation for the  Diffuse Shader " , default = True)
+        
+        # Percentage randomisation
+        bpy.types.Scene.texture_general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
+        
+        # this is the dictionary that stores history
+        bpy.types.Scene.texture_history_index = IntProperty(name= "History Index" ,description = "The eumber of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
+        self.history={}
+        self.delete_start_index=1
+        
+        # the prop that controls the text wrap in help menu
+        bpy.types.Scene.text_width = IntProperty(name = "Text Width" , description = "The width above which the text wraps" , default = 20 , max = 180 , min = 1)
+        
+        # here is where history dictionary is saved with the blend file
+        # if the backup is already saved with the blend file it is used 
+        # to restory the history dictionary , if not it is created
+        
+        if hasattr(bpy.context.scene , "historybak")==False:
+            bpy.types.Scene.texture_historybak = StringProperty()
+            print("created history backup")
+            
+         # non read only material properties where keyframes can be inserted or removed
+        self.animated_properties=["alpha",
+        "use_vertex_color_paint"]
+            
+        
+    # compute randomisation based on the general or specific percentage chosen
+    # if the specific percentage is zero then the general percentage is used
+    def compute_percentage(self,min,max,value,percentage):
+        range = max-min
+        general_percentage = bpy.context.scene.texture_general_percentage
+        
+        if percentage == 0:
+            percentage_random = ( value -((range*(general_percentage/100))/2) )+ (range * (general_percentage / 100) * random.random())
+        else:
+            percentage_random = ( value - ((range*(percentage/100))/2)) + (range * (percentage / 100) * random.random())
+             
+        if percentage_random > max:
+            percentage_random = max
+        if percentage_random < min:
+            percentage_random = min
+        
+        return percentage_random 
+    
+    #deletes from history an index but without leaving empty spaces, everythings is pushed back    
+    def delete_from_history(self):
+        
+        length = len(self.history)
+        index = bpy.context.scene.texture_history_index
+        for x in range(index , length):
+            if index != length :
+                self.history[x]= self.history[x+1] 
+        del self.history[length]
+        length = len(self.history) 
+        if index <= length:
+            self.activate()
+            
+        bpy.context.scene.texture_historybak = str(self.rm_history)
+    """
+    # the fuction that randomises the material 
+    def random_material(self,active_material,name):
+        mat = active_material
+        scn = bpy.context.scene
+             
+        #checks that the user has allowed the randomisation of that specific parameter            
+        if scn.rdiffuse_color:
+            rand_perc = scn.rdiffuse_color_percentage
+            mat.diffuse_color = (self.compute_percentage(0,1,mat.diffuse_color[0],rand_perc),
+            self.compute_percentage(0,1,mat.diffuse_color[1],rand_perc),
+            self.compute_percentage(0,1,mat.diffuse_color[2],rand_perc))
+            
+        self.store_to_history(mat)
+          
+        return mat
+"""
+    #store active material to history
+    def store_to_history(self, texture):
+        scn = bpy.context.scene
+        history_index = scn.texture_history_index
+        self.history[history_index]= {"name" : texture.name} 
+        print("mat stored : "+self.history[history_index]["name"])
+        texture.use_fake_user = True
+                 
+        bpy.context.scene.texture_historybak = str(self.history)
+    """    
+    # Activate. Make active material the particular history index the user has chosen
+    def activate(self, random_assign = False):
+        
+        for i in bpy.context.selected_objects :
+            if random_assign == False and i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history ) and rm.rm_history[bpy.context.scene.history_index]:                
+                scn = bpy.context.scene
+                mat = i.active_material
+                index = scn.history_index
+                
+            if random_assign == True and i.type == 'MESH' :
+            
+                index = round(len(self.rm_history) * random.random())
+                
+                if index == 0 :
+                    index = 1
+                    
+                scn = bpy.context.scene
+                mat = i.active_material
+                scn.history_index=index
+                
+            material_slots_backup =[]    
+            material_slots_len = len(i.material_slots)
+            
+            for x in range(0,material_slots_len):
+                print("x = ",x)
+                if x==0:
+                    print("appending stored material")
+                    i.active_material_index=material_slots_len-1
+                    i.data.materials.append(bpy.data.materials[self.rm_history[index]["name"]])
+                    i.active_material_index=0
+                    bpy.ops.object.material_slot_remove()
+                
+                else:
+                    print("deleting materials")
+                    i.active_material_index=0
+                    material_slots_backup.append(i.material_slots[0].material.name)
+                    print("backup : "+i.material_slots[0].material.name)
+                    bpy.ops.object.material_slot_remove()
+                    
+            
+            i.active_material_index=0
+            for y in range(0,len(material_slots_backup)):
+                i.active_material_index=y
+                i.data.materials.append(bpy.data.materials[material_slots_backup[y]])
+            i.active_material_index=0
+                  
+ """
+    # a nice multi label                        
+    def multi_label(self, text, ui,text_width):
+        
+        for x in range(0,len(text)):
+            el = textwrap.wrap(text[x], width = text_width)
+            
+            for y in range(0,len(el)):
+                ui.label(text=el[y])
+                
+    def draw_gui(self ,context,panel):
+        """layout = panel.layout
+        row = layout.row()
+        row.prop(context.scene , "gui_mode" )
+        
+        # check which Gui mode the user has selected (Simple is the default one and display the appropriate gui
+        
+        if context.scene.gui_mode == 'simple' :
+            box = layout.box()
+            box.prop(context.scene,"rdiffuse_shader", toggle = True)
+            box.prop(context.scene,"rdiffuse_color", toggle = True)
+            box.prop(context.scene,"rdiffuse_intensity", toggle = True)
+            box.prop(context.scene,"rspecular_shader", toggle = True)
+            box.prop(context.scene,"rspecular_color", toggle = True)
+            box.prop(context.scene,"rspecular_intensity", toggle = True)
+            box.prop(context.scene,"rspecular_hardness", toggle = True)
+            box.prop(context.scene,"rtransparency", toggle = True)
+            box.prop(context.scene,"rtexture", toggle = True)
+            
+            box.prop(context.scene,"general_percentage", slider = True)           
+            layout.operator("gyes.random_material")
+            
+        if context.scene.gui_mode == 'simple_percentage' :
+            box = layout.box()
+            
+            if context.scene.rdiffuse_shader :
+                box.prop(context.scene,"rdiffuse_shader_percentage", slider = True)
+            else:
+                box.label(text="Diffuse Shader is disabled ")
+                
+            if context.scene.rdiffuse_color :
+                box.prop(context.scene,"rdiffuse_color_percentage", slider = True)
+            else:
+                box.label(text="Diffuse Color is disabled ")
+                
+            if context.scene.rdiffuse_intensity :
+                box.prop(context.scene,"rdiffuse_intensity_percentage", slider = True)
+            else:
+                box.label(text="Diffuse Intensity is disabled ")
+                
+            if context.scene.rspecular_shader :
+                box.prop(context.scene,"rspecular_shader_percentage", slider = True)
+            else:
+                box.label(text="Specular Shader is disabled ")
+                
+            if context.scene.rspecular_color :
+                box.prop(context.scene,"rspecular_color_percentage", slider = True)
+            else:
+                box.label(text="Specular Color is disabled ")
+                
+            if context.scene.rspecular_intensity :
+                box.prop(context.scene,"rspecular_intensity_percentage", slider = True)
+            else:
+                box.label(text="Specular Intensity is disabled ")
+                
+            if context.scene.rspecular_hardness :
+                box.prop(context.scene,"rspecular_hardness_percentage", slider = True)
+            else:
+                box.label(text="Specular Hardness is disabled ")
+            
+            if context.scene.rtransparency :
+                box.prop(context.scene,"rtransparency_percentage", slider = True)
+            else:
+                box.label(text="Transparency is disabled ")
+                
+            box.prop(context.scene,"general_percentage", slider = True)
+            layout.operator("gyes.random_material")
+        
+        if context.scene.gui_mode== 'templates' : 
+            box = layout.box()
+                    
+        if context.scene.gui_mode== 'help' :
+            box = layout.box()
+            help_text=["","Copyright 2011 Kilon  ",
+            "GYES - RGM",    
+            "Random Material  Generator",
+            "A tool that generates random materials.",
+            "",
+            "Simple Mode",
+            "--------------------------",
+            "In this mode you can do basic randomisation. Choose parameters you want to randomise by turning them on or off with clicking on them. Hit the random button when you are ready. Each time you hit the button the new random material is stored in a history index",
+            "",
+            "History",
+            "--------------------------",
+            "History index -> choose index",
+            "( < ) -> Previous index (activate)",
+            "( > ) -> Next index (activate)",
+            "( |< ) -> First history index",
+            "( >| ) -> Last history index",
+            "Activate -> use this index as active material",
+            "Animate -> Insert a keyframe in the current frame for every singly non read only material property",
+            "X -> Remove a keyframe in the current frame for every singly non read only material property",
+            "R -> works just like activate but instead of using the current selected index use a randomly selected one",
+            "Delete -> delete this index",
+            "Del start -> start deletion from here",
+            "Del end -> end deletion here",
+            "Restore -> restores history from the saved blend file",
+            "",
+            "Percentage",
+            "--------------------------",
+            "Percentage randomisation means that the parameter is randomised inside a range of percentage of the full range of the value. When a specific percentage is zero, the general percentage is used instead for that area. When a specific percentage is not zero then general percentage is ignored and specific percentage is used instead. If you dont want to randomise that area at all, in Simple Mode use the corresponding button to completely disable that area , the percentage slider will also be disable in the percentage mode. Randomisation takes always the current value as starting point so the next randomisation will use the current randomised value. Randomisation is always 50% of the specific percentage bellow the current value and 50% above . If the percentage exceeed minimum and maximum values of the full range, then it will default to minimum and maximum accordingly. "]
+            w=bpy.context.scene.text_width
+            box.prop(context.scene,"text_width", slider =True)
+            self.multi_label(help_text,box,w) 
+                                
+        # Display the History Gui for all modes
+        
+        layout.label(text="History")
+        history_box= layout.box()
+        history_box.prop(context.scene, "history_index")
+        row = history_box.row()
+        row.operator("gyes.first")
+        row.operator("gyes.previous")
+        row.operator("gyes.next")
+        row.operator("gyes.last")
+        rm_index = context.scene.history_index
+        
+        if rm_index in self.rm_history and self.rm_history[rm_index] :
+            row = history_box.row()
+            a = row.split(percentage = 0.3, align = True)
+            a.operator("gyes.activate")
+            a.operator("gyes.animate")
+            b=a.split(percentage = 0.3, align = True)
+            b.operator("gyes.x")
+            b.operator("gyes.random_activate")                       
+        else:
+            history_box.label(text= "Empty Index ! ")
+        
+        if context.scene.history_index < len(self.rm_history)+2:
+            history_box.operator("gyes.store")
+        else:
+            history_box.label(text= "Not the first Empty Index")
+            
+        if rm_index in self.rm_history and self.rm_history[rm_index] :
+            history_box.operator("gyes.delete")
+            row2 = history_box.row()
+            row2.operator("gyes.delete_start")
+            row2.operator("gyes.delete_end")
+            
+        if hasattr(bpy.context.scene,"historybak") and bpy.context.scene.historybak!='':
+            history_box.operator("gyes.restore")
+        else:
+            history_box.label(text="Backup not Found")
+                                     
+# create the instance class for randomisation   
+rm =random_material_class()
+"""
+"""            
+        
+# Generate the random material button
+class gyes_random_material(bpy.types.Operator):
+    
+    bl_idname = "gyes.random_material"
+    bl_label = "Random Material"
+    label = bpy.props.StringProperty()
+    bl_description = "Generate the random material"
+    
+    def execute(self, context):
+        for i in context.selected_objects :
+            if i.type == 'MESH' :
+
+                if not i.material_slots:
+                    print("no material_slot found , creating new with material")
+                    new_random = bpy.data.materials.new("Random")
+                    i.active_material=new_random
+                    rm.random_material(i.active_material,'Random')
+
+
+                if i.material_slots[0].material:
+                    print("found an existing material, using this one ")
+                    rm.random_material(i.active_material,'Random')
+
+                if not i.material_slots[0].material:
+                    print("no material found , creating new")
+                    new_random = bpy.data.materials.new("Random")
+                    i.active_material=new_random
+                    rm.random_material(i.active_material,'Random')
+
+        return{'FINISHED'}
+
+# Move to the first history index and activate it
+class history_first(bpy.types.Operator):
+    
+    bl_label = "|<"
+    bl_idname = "gyes.first"
+    bl_description = "Move to the first history index and activate it"
+    
+    def execute(self, context):
+        context.scene.history_index = 1 
+        rm.activate()
+        
+        return{'FINISHED'}
+
+# Move to the previous hisory index and activate it
+class history_previous(bpy.types.Operator):
+    
+    bl_label = "<"
+    bl_idname = "gyes.previous"
+    bl_description = "Move to the previous history index and activate it"
+    
+    def execute(self, context):
+        if context.scene.history_index > 1 :
+            context.scene.history_index = context.scene.history_index -1
+            rm_index = context.scene.history_index
+            if rm_index in rm.rm_history and rm.rm_history[rm_index]:
+                rm.activate()
+        
+        return{'FINISHED'}
+
+# Move to the next hisory index and activate it
+class history_next(bpy.types.Operator):
+    
+    bl_label = ">"
+    bl_idname = "gyes.next"
+    bl_description = "Move to the next history index and activate it"
+    
+    def execute(self, context):
+        if context.scene.history_index > 0 :
+            context.scene.history_index = context.scene.history_index +1
+            rm_index = context.scene.history_index
+            if rm_index in rm.rm_history and rm.rm_history[rm_index]:
+                rm.activate()
+        
+        return{'FINISHED'}
+    
+
+# Move to the last hisory index and activate it
+class history_last(bpy.types.Operator):
+    
+    bl_label = ">|"
+    bl_idname = "gyes.last"
+    bl_description = "Move to the last history index and activate it"
+    
+    def execute(self, context):
+        index = rm.rm_history 
+        context.scene.history_index = len(index) 
+        rm.activate()
+        
+        return{'FINISHED'}
+
+# The current history index becomes the active material 
+class history_activate(bpy.types.Operator):
+    
+    bl_label = "Activate"
+    bl_idname = "gyes.activate"
+    bl_description = "The current history index becomes the active material"
+    
+    def execute(self, context):
+        rm_index = context.scene.history_index
+        if rm.rm_history[rm_index] != {}:
+            rm.activate()
+        
+        return{'FINISHED'}
+
+# A random history index becomes the active material 
+class history_random_activate(bpy.types.Operator):
+    
+    bl_label = "R"
+    bl_idname = "gyes.random_activate"
+    bl_description = "A random history index becomes the active material"
+    
+    def execute(self, context):
+        rm_index = context.scene.history_index
+        if rm.rm_history[rm_index] != {}:
+            rm.activate(random_assign = True)
+        
+        return{'FINISHED'}
+
+
+# It stores current active material to the selected history index
+class store_to_history(bpy.types.Operator):
+    
+    bl_label = "Store"
+    bl_idname = "gyes.store"
+    bl_description = " It stores current active material to the selected history index"
+    
+    def execute(self, context):
+        mat = context.selected_objects[0].active_material
+        rm.store_to_history(mat)
+                 
+        return{'FINISHED'}
+
+# Delete selected history index from history
+class delete_from_history(bpy.types.Operator):
+    
+    bl_label = "Delete"
+    bl_idname = "gyes.delete"
+    bl_description = "Delete selected history index from history"
+    
+    def execute(self, context):
+        rm.delete_from_history()
+        
+        return{'FINISHED'}
+               
+# Start deletion from this index
+class delete_from_history_start(bpy.types.Operator):
+    
+    bl_label = "Del Start"
+    bl_idname = "gyes.delete_start"
+    bl_description = "Start deletion from this index"
+    
+    def execute(self, context):
+        rm_index = context.scene.history_index
+        rm.delete_start_index = rm_index
+        
+        return{'FINISHED'}   
+
+# End deletion here and delete all selected indices
+class delete_from_history_end(bpy.types.Operator):
+    
+    bl_label = "Del End"
+    bl_idname = "gyes.delete_end"
+    bl_description = "End deletion here and delete all selected indices"
+    
+    def execute(self, context):
+        delete_end_index = context.scene.history_index
+        context.scene.history_index = rm.delete_start_index
+        for x in range ( rm.delete_start_index , delete_end_index):
+            rm.delete_from_history()
+        
+        return{'FINISHED'} 
+    
+# End deletion here and delete all selected indices
+class restore_history(bpy.types.Operator):
+    
+    bl_label = "Restore"
+    bl_idname = "gyes.restore"
+    bl_description = "Restore history"
+    
+    def execute(self, context):
+        
+        s=""
+        s = bpy.context.scene.historybak
+       
+        rm.rm_history=eval(s)
+        
+        print("restored history dictionary") 
+        
+        return{'FINISHED'} 
+    
+# Animate inserts a keyframe for every randomised material parameter except nodes
+class animate(bpy.types.Operator):
+    
+    bl_label = "Animate"
+    bl_idname = "gyes.animate"
+    bl_description = "Animate inserts a keyframe for every non read only material parameter"
+    
+    def execute(self, context):
+        framen = bpy.context.scene.frame_current
+        for i in range(0,len(bpy.context.selected_objects)):
+            mat = bpy.context.selected_objects[i].active_material
+                        
+            for y in range(0,len(rm.animated_properties)):
+                mat.keyframe_insert(data_path = rm.animated_properties[y], frame = framen)
+        
+        return{'FINISHED'}
+ 
+# Remove Animation
+class x(bpy.types.Operator):
+    
+    bl_label = "X"
+    bl_idname = "gyes.x"
+    bl_description = "Reverse Animate by deleting every keyframe inserted by animate for every non read only material parameter"
+    
+    def execute(self, context):
+        framen = bpy.context.scene.frame_current
+        for i in range(0,len(bpy.context.selected_objects)):
+            mat = bpy.context.selected_objects[i].active_material
+            
+            for y in range(0,len(rm.animated_properties)):
+                mat.keyframe_delete(data_path = rm.animated_properties[y], frame = framen)
+        
+        return{'FINISHED'}
+         
+#registration is necessary for the script to appear in the GUI
+def register():
+    bpy.utils.register_class(gyes_panel)
+    bpy.utils.register_class(gyes_random_material)
+    bpy.utils.register_class(history_previous)
+    bpy.utils.register_class(history_next)
+    bpy.utils.register_class(history_activate)
+    bpy.utils.register_class(history_random_activate)
+    bpy.utils.register_class(store_to_history)
+    bpy.utils.register_class(delete_from_history)
+    bpy.utils.register_class(delete_from_history_start)
+    bpy.utils.register_class(delete_from_history_end)
+    bpy.utils.register_class(history_first)
+    bpy.utils.register_class(history_last)
+    bpy.utils.register_class(restore_history)
+    bpy.utils.register_class(animate)
+    bpy.utils.register_class(x)
+def unregister():
+    bpy.utils.unregister_class(gyes_panel)
+    bpy.utils.unregister_class(gyes_random_material)
+    bpy.utils.unregister_class(history_previous)
+    bpy.utils.unregister_class(history_next)
+    bpy.utils.unregister_class(history_activate)
+    bpy.utils.unregister_class(history_random_activate)
+    bpy.utils.unregister_class(store_to_history)
+    bpy.utils.unregister_class(delete_from_history)
+    bpy.utils.unregister_class(delete_from_history_start)
+    bpy.utils.unregister_class(delete_from_history_end)
+    bpy.utils.unregister_class(history_first)
+    bpy.utils.unregister_class(history_last)
+    bpy.utils.unregister_class(restore_history)
+    bpy.utils.unregister_class(animate)
+    bpy.utils.unregister_class(x)
+    
+if __name__ == '__main__':
+    register()"""
