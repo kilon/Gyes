@@ -214,7 +214,11 @@ class random_material_class:
 
     # randomise textures
     def random_textures(self,mat):
-        print("randomising textures")
+        
+        # if there is an available texture , randomise that one
+        if mat.texture_slots[0] and mat.texture_slots[0].texture:
+            if mat.texture_slots[0].texture:    
+                print("randomising textures")
   
     #store active material to history
     def store_to_history(self, mat):
