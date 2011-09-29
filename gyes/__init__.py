@@ -35,9 +35,11 @@ bl_info = {
 if "bpy" in locals():
     import imp
     imp.reload(random_material_generator)
+    imp.reload(random_texture_generator)
     #imp.reload(random_landscape_generator)
 else:
     from gyes import random_material_generator
+    from gyes import random_texture_generator
     #from gyes import random_landscape_generator
     
 import bpy
@@ -47,11 +49,13 @@ from bpy.props import *
 # Choose the tool you want to use
 bpy.types.Scene.tool = EnumProperty(attr='tool', name='Tool', items=(
 ('RMG', 'RMG', 'Random Material Generator'),
+('RTG', 'RTG', 'Random Texture Generator'),
 ('RLG', 'RLG' , 'Random Landscape Generator'),
 ('TARTARA', 'TARTARA', 'An online Library for any kind of blender asset')),default='RMG')
 
 
-rm = random_material_generator.rm                 
+rm = random_material_generator.rm
+rt = random_texture_generator.rt                 
 # this the main panel
 class gyes_panel(bpy.types.Panel):
     bl_label = "Gyes"
@@ -73,6 +77,10 @@ class gyes_panel(bpy.types.Panel):
         
         if context.scene.tool == 'RMG' :
             rm.draw_gui(context,self)
+        
+        if context.scene.tool == 'RTG' :
+            rt.draw_gui(context,self)
+ 
         r = layout.row()
         if context.scene.tool == 'RLG' :
             r.label(text="WIP not finished yet")
