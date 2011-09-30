@@ -19,7 +19,23 @@ class random_texture_class:
 ('help', 'Help', 'The third item')), default='simple')
 
         # Here I define the selective areas that the user can enable or disable for randomisation in simple mode               
-                     
+        bpy.types.Scene.rtexture_type = EnumProperty(attr='type', name='type', items=(
+('RANDOM','RANDOM','RANDOM'),
+('BLEND','BLEND','BLEND'),
+('CLOUDS','CLOUDS','CLOUDS'),
+('DISTORTED_NOISE','DISTORTED_NOISE','DISTORTED_NOISE'),
+('ENVIRONMENT_MAP','ENVIRONMENT_MAP','ENVIRONMENT_MAP'),
+('IMAGE','IMAGE','IMAGE'),
+('MAGIC','MAGIC','MAGIC'),
+('MARBLE','MARBLE','MARBLE'),
+('MUSGRAVE','MUSGRAVE','MUSGRAVE'),
+('NOISE','NOISE','NOISE'),
+('POINT_DENSITY','POINT_DENSITY','POINT_DENSITY'),
+('STUCCI','STUCCI','STUCCI'),
+('VORONOI','VORONOI','VORONOI'),
+('VOXEL_DATA','VOXEL_DATA','VOXEL_DATA'),
+('WOOD','WOOD','WOOD')), default='RANDOM')
+            
         bpy.types.Scene.rtexture_intensity = BoolProperty(name= "Intensity" ,description = "Intensity of the texture" , default = True)
         
         # Percentage randomisation
@@ -85,12 +101,23 @@ class random_texture_class:
     # the fuction that randomises the material 
     def random_texture(self,material):
         scn = bpy.context.scene
-        if material.texture_slots[0].texture:
-            texture = material.texture_slots[0].texture 
+        if material.texture_slots[material.active_texture_index] and material.texture_slots[material.active_texture_index].texture:
+            texture = material.texture_slots[material.active_texture_index].texture
+            if not scn.rtexture_type=='Random':
+               texture = bpy.data.textures.new('Rand_tex_',scn.rtexture_type)
+            else:
+               texture = bpy.data.textures.new('Rand_tex_','NOISE')
+            material.texture_slots[material.active_texture_index].texture = texture 
         else:
-            texture = bpy.data.textures.new('Rand_tex_','NOISE')
-     
-        texture.intensity = self.compute_percentage(0,1,texture.intensity,scn.rtexture_intensity_percentage)
+            material.texture_slots.create(material.active_texture_index)           
+            if not scn.rtexture_type=='Random':
+               texture = bpy.data.textures.new('Rand_tex_',scn.rtexture_type)
+            else:
+               texture = bpy.data.textures.new('Rand_tex_','NOISE')
+            material.texture_slots[material.active_texture_index].texture = texture
+        
+        if scn.rtexture_type == 'NOISE':
+          texture.intensity = float(self.compute_percentage(0,1,texture.intensity,scn.rtexture_intensity_percentage))
             
         #self.store_to_history(texture)
           
@@ -171,16 +198,20 @@ class random_texture_class:
         
         if context.scene.rtexture_gui_mode == 'simple' :
             box = layout.box()
-            box.prop(context.scene,"rtexture_intensity", toggle = True)
+            box.prop(context.scene,"rtexture_type")
+            
+            if context.scene.rtexture_type=='NOISE':
+               box.prop(context.scene,"rtexture_intensity", toggle = True)
+            
             box.prop(context.scene,"rtexture_general_percentage", slider = True)
             layout.operator("gyes.random_texture")
             
         if context.scene.rtexture_gui_mode == 'simple_percentage' :
             box = layout.box()
             
-            if context.scene.rtexture_intensity:
+            if context.scene.rtexture_intensity and context.scene.rtexture_type=='NOISE':
                 box.prop(context.scene,"rtexture_intensity_percentage", slider = True)
-            else:
+            elif context.scene.rtexture_intensity==False and context.scene.rtexture_type=='NOISE':
                 box.label(text="Texture Intensity disabled ")
                
             box.prop(context.scene,"rtexture_general_percentage", slider = True)
