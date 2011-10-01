@@ -146,8 +146,16 @@ class random_texture_class:
           
         if scn.rtexture_type == 'NOISE':
             
+            if scn.rtexture_color:
+                texture.factor_red = self.compute_percentage(0,2,texture.factor_red,scn.rtexture_color_percentage)
+                texture.factor_green = self.compute_percentage(0,2,texture.factor_green,scn.rtexture_color_percentage)
+                texture.factor_blue = self.compute_percentage(0,2,texture.factor_blue,scn.rtexture_color_percentage)
             if scn.rtexture_intensity:
                 texture.intensity = self.compute_percentage(0,2,texture.intensity,scn.rtexture_intensity_percentage)
+            if scn.rtexture_contrast:
+                texture.contrast = self.compute_percentage(0,5,texture.contrast,scn.rtexture_contrast_percentage)
+            if scn.rtexture_saturation:
+                texture.saturation = self.compute_percentage(0,2,texture.saturation,scn.rtexture_saturation_percentage)
           
         #self.store_to_history(texture)
           
@@ -239,8 +247,11 @@ class random_texture_class:
                box.prop(context.scene,"rtexture_axis", toggle = True)
             
             if context.scene.rtexture_type=='NOISE':
+               box.prop(context.scene,"rtexture_color", toggle = True)
                box.prop(context.scene,"rtexture_intensity", toggle = True)
-            
+               box.prop(context.scene,"rtexture_contrast", toggle = True)
+               box.prop(context.scene,"rtexture_saturation", toggle = True)
+                           
             box.prop(context.scene,"rtexture_general_percentage", slider = True)
             layout.operator("gyes.random_texture")
             
@@ -271,10 +282,25 @@ class random_texture_class:
             
             if context.scene.rtexture_type=='NOISE':
             
+                if context.scene.rtexture_color:
+                    box.prop(context.scene,"rtexture_color_percentage", slider = True)
+                else:
+                    box.label(text="Texture Intensity disabled ")
+                    
                 if context.scene.rtexture_intensity:
                     box.prop(context.scene,"rtexture_intensity_percentage", slider = True)
                 else:
                     box.label(text="Texture Intensity disabled ")
+                
+                if context.scene.rtexture_intensity: 
+                    box.prop(context.scene,"rtexture_contrast_percentage", slider = True)
+                else:
+                    box.label(text="Texture Contrast disabled ")
+                
+                if context.scene.rtexture_saturation: 
+                    box.prop(context.scene,"rtexture_saturation_percentage", slider = True)
+                else:
+                    box.label(text="Texture Saturation disabled ")
                
             box.prop(context.scene,"rtexture_general_percentage", slider = True)
             layout.operator("gyes.random_texture")
