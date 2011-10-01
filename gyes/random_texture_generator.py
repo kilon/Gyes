@@ -35,15 +35,22 @@ class random_texture_class:
 ('VORONOI','VORONOI','VORONOI'),
 ('VOXEL_DATA','VOXEL_DATA','VOXEL_DATA'),
 ('WOOD','WOOD','WOOD')), default='RANDOM')
-            
+
+        bpy.types.Scene.rtexture_color = BoolProperty(name= "Color Factor" ,description = "Color factor of the texture" , default = True)    
         bpy.types.Scene.rtexture_intensity = BoolProperty(name= "Intensity" ,description = "Intensity of the texture" , default = True)
+        bpy.types.Scene.rtexture_contrast = BoolProperty(name= "Contrast" ,description = "Contrast of the texture" , default = True)
+        bpy.types.Scene.rtexture_saturation = BoolProperty(name= "Saturation" ,description = "Saturation of the texture" , default = True)
+        bpy.types.Scene.rtexture_progression = BoolProperty(name= "Progression" ,description = "Progression of the texture" , default = True)
+        bpy.types.Scene.rtexture_axis = BoolProperty(name= "Progr. Axis" ,description = "Progression of the texture" , default = True)
         
         # Percentage randomisation
         bpy.types.Scene.rtexture_general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_color_percentage = IntProperty(name="Color Factor", description = " Color factor percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_intensity_percentage = IntProperty(name="Intensity", description = " Intensity of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-
-
-        
+        bpy.types.Scene.rtexture_contrast_percentage = IntProperty(name="Contrast", description = " Contrast of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_saturation_percentage = IntProperty(name="Saturation", description = " Saturation of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_progression_percentage = IntProperty(name="Saturation", description = " Saturation of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+       
         # this is the dictionary that stores history
         bpy.types.Scene.rtexture_history_index = IntProperty(name= "History Index" ,description = "The eumber of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
         self.history={}
@@ -101,12 +108,14 @@ class random_texture_class:
     # the fuction that randomises the material 
     def random_texture(self,material):
         scn = bpy.context.scene
+        
+        # if the texture exists use that for randomisation if not then create a new one
         if material.texture_slots[material.active_texture_index] and material.texture_slots[material.active_texture_index].texture:
             texture = material.texture_slots[material.active_texture_index].texture
             if not scn.rtexture_type=='Random':
-               texture = bpy.data.textures.new('Rand_tex_',scn.rtexture_type)
+               texture.type = scn.rtexture_type
             else:
-               texture = bpy.data.textures.new('Rand_tex_','NOISE')
+               texture.type = 'NOISE'
             material.texture_slots[material.active_texture_index].texture = texture 
         else:
             material.texture_slots.create(material.active_texture_index)           
@@ -116,9 +125,30 @@ class random_texture_class:
                texture = bpy.data.textures.new('Rand_tex_','NOISE')
             material.texture_slots[material.active_texture_index].texture = texture
         
-        if scn.rtexture_type == 'NOISE':
-          texture.intensity = float(self.compute_percentage(0,1,texture.intensity,scn.rtexture_intensity_percentage))
+        # randomise parameters depending on the type of the texture
+        
+        if scn.rtexture_type == 'BLEND':
             
+            if scn.rtexture_color:
+                texture.factor_red = self.compute_percentage(0,2,texture.factor_red,scn.rtexture_color_percentage)
+                texture.factor_green = self.compute_percentage(0,2,texture.factor_green,scn.rtexture_color_percentage)
+                texture.factor_blue = self.compute_percentage(0,2,texture.factor_blue,scn.rtexture_color_percentage)
+            if scn.rtexture_intensity:
+                texture.intensity = self.compute_percentage(0,2,texture.intensity,scn.rtexture_intensity_percentage)
+            if scn.rtexture_contrast:
+                texture.contrast = self.compute_percentage(0,5,texture.contrast,scn.rtexture_contrast_percentage)
+            if scn.rtexture_saturation:
+                texture.saturation = self.compute_percentage(0,2,texture.saturation,scn.rtexture_saturation_percentage)
+            if scn.rtexture_progression:
+                texture.progression = random.choice(['LINEAR', 'QUADRATIC', 'EASING', 'DIAGONAL', 'SPHERICAL', 'QUADRATIC_SPHERE', 'RADIAL'])
+            if scn.rtexture_axis and not (texture.progression=='DIAGONAL' or texture.progression=='SPHERICAL' or texture.progression=='QUADRATIC_SPHERE'):
+                texture.use_flip_axis = random.choice(['HORIZONTAL', 'VERTICAL'])
+          
+        if scn.rtexture_type == 'NOISE':
+            
+            if scn.rtexture_intensity:
+                texture.intensity = self.compute_percentage(0,2,texture.intensity,scn.rtexture_intensity_percentage)
+          
         #self.store_to_history(texture)
           
         return texture
@@ -200,6 +230,14 @@ class random_texture_class:
             box = layout.box()
             box.prop(context.scene,"rtexture_type")
             
+            if context.scene.rtexture_type=='BLEND':
+               box.prop(context.scene,"rtexture_color", toggle = True)
+               box.prop(context.scene,"rtexture_intensity", toggle = True)
+               box.prop(context.scene,"rtexture_contrast", toggle = True)
+               box.prop(context.scene,"rtexture_saturation", toggle = True)
+               box.prop(context.scene,"rtexture_progression", toggle = True)
+               box.prop(context.scene,"rtexture_axis", toggle = True)
+            
             if context.scene.rtexture_type=='NOISE':
                box.prop(context.scene,"rtexture_intensity", toggle = True)
             
@@ -209,16 +247,41 @@ class random_texture_class:
         if context.scene.rtexture_gui_mode == 'simple_percentage' :
             box = layout.box()
             
-            if context.scene.rtexture_intensity and context.scene.rtexture_type=='NOISE':
-                box.prop(context.scene,"rtexture_intensity_percentage", slider = True)
-            elif context.scene.rtexture_intensity==False and context.scene.rtexture_type=='NOISE':
-                box.label(text="Texture Intensity disabled ")
+            if context.scene.rtexture_type=='BLEND':
+            
+                if context.scene.rtexture_color:
+                    box.prop(context.scene,"rtexture_color_percentage", slider = True)
+                else:
+                    box.label(text="Texture Intensity disabled ")
+                    
+                if context.scene.rtexture_intensity:
+                    box.prop(context.scene,"rtexture_intensity_percentage", slider = True)
+                else:
+                    box.label(text="Texture Intensity disabled ")
+                
+                if context.scene.rtexture_intensity: 
+                    box.prop(context.scene,"rtexture_contrast_percentage", slider = True)
+                else:
+                    box.label(text="Texture Contrast disabled ")
+                
+                if context.scene.rtexture_saturation: 
+                    box.prop(context.scene,"rtexture_saturation_percentage", slider = True)
+                else:
+                    box.label(text="Texture Saturation disabled ")
+            
+            if context.scene.rtexture_type=='NOISE':
+            
+                if context.scene.rtexture_intensity:
+                    box.prop(context.scene,"rtexture_intensity_percentage", slider = True)
+                else:
+                    box.label(text="Texture Intensity disabled ")
                
             box.prop(context.scene,"rtexture_general_percentage", slider = True)
             layout.operator("gyes.random_texture")
         
         if context.scene.rtexture_gui_mode== 'templates' : 
             box = layout.box()
+            box.label(text="Not yet implemented")
                     
         if context.scene.rtexture_gui_mode== 'help' :
             box = layout.box()
