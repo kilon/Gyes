@@ -20,16 +20,16 @@
 """ Copyright  Kilon 2011 GPL licence applies"""
 
 bl_info = {
-    "name": "Material_Gyes",
+    "name": "Gyes (A Blender MultiTool)",
     "description": "Gyes is a collection of scripts that simplify , automate and extend blender",
     "author": "Kilon",
     "version": (0,5),
-    "blender": (2, 5, 8),
-    "api": 38600,
+    "blender": (2, 5, 9),
+    "api": 40500,
     "location": "View3D > Left panel ",
     "warning": '', # used for warning icon and text in addons panel
-    "wiki_url": "http://blenderartists.org/forum/showthread.php?218110-Gyes-%28Random-Material-Generator%29",
-    "tracker_url": "http://projects.blender.org/tracker/index.php?func=detail&aid=27470&group_id=153&atid=467",
+    "wiki_url": "http://blenderartists.org/forum/showthread.php?232704-GYES-(-A-multi-tool-for-Blender)",
+    "tracker_url": "https://github.com/kilon/Gyes",
     "category": "Other"}
     
 if "bpy" in locals():
