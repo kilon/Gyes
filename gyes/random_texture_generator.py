@@ -50,6 +50,7 @@ class random_texture_class:
         bpy.types.Scene.rtexture_noise_depth = BoolProperty(name= "Noise Depth" ,description = "Noise Depth of the texture" , default = True)
         bpy.types.Scene.rtexture_noise_distortion = BoolProperty(name= "Noise Distortion" ,description = "Noise Distortion of the texture" , default = True)
         bpy.types.Scene.rtexture_distortion = BoolProperty(name= "Distortion" ,description = "Distortion of the texture" , default = True)
+        bpy.types.Scene.rtexture_turbulence = BoolProperty(name= "Turbulence" ,description = "Turbulence of the texture" , default = True)
         
         
         # Percentage randomisation
@@ -62,6 +63,7 @@ class random_texture_class:
         bpy.types.Scene.rtexture_nabla_percentage = IntProperty(name="Nabla", description = " Nabla of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_noise_depth_percentage = IntProperty(name="Noise Depth", description = " Noise Depth of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_distortion_percentage = IntProperty(name="Distortion", description = "Distortion of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_turbulence_percentage = IntProperty(name="Turbulence", description = "Turbulence of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         
        
         # this is the dictionary that stores history
@@ -194,6 +196,16 @@ class random_texture_class:
                 texture.nabla = self.compute_percentage(0,0.10,texture.nabla,scn.rtexture_nabla_percentage)
             if scn.rtexture_noise_scale:
                 texture.noise_scale = self.compute_percentage(0,2,texture.noise_scale,scn.rtexture_noise_scale_percentage)
+        
+        if scn.rtexture_type == 'MAGIC':
+            
+            self.random_texture_color(texture)
+            
+            if scn.rtexture_noise_depth:
+                texture.noise_depth = int(self.compute_percentage(0,24,texture.noise_depth,scn.rtexture_noise_depth_percentage))
+            if scn.rtexture_turbulence:
+                texture.turbulence = int(self.compute_percentage(0,1000,texture.turbulence,scn.rtexture_turbulence_percentage))    
+            
               
         if scn.rtexture_type == 'NOISE':
             
@@ -331,6 +343,11 @@ class random_texture_class:
                box.prop(context.scene,"rtexture_nabla", toggle = True)
                box.prop(context.scene,"rtexture_noise_scale", toggle = True)   
             
+            if context.scene.rtexture_type=='MAGIC':
+               self.draw_gui_simple_texture_color(context,box)
+               box.prop(context.scene,"rtexture_turbulence", toggle = True)
+               box.prop(context.scene,"rtexture_noise_depth", toggle = True)
+            
             if context.scene.rtexture_type=='NOISE':
                self.draw_gui_simple_texture_color(context,box)
                
@@ -367,8 +384,7 @@ class random_texture_class:
             if context.scene.rtexture_type=='DISTORTED NOISE':
             
                 self.draw_gui_percentage_texture_color(context,box)
-                
-                
+                    
                 if context.scene.rtexture_distortion: 
                     box.prop(context.scene,"rtexture_distortion_percentage", slider = True)
                 else:
@@ -383,6 +399,20 @@ class random_texture_class:
                     box.prop(context.scene,"rtexture_noise_scale_percentage", slider = True)
                 else:
                     box.label(text="Texture Noise Scale disabled ")
+            
+            if context.scene.rtexture_type=='MAGIC':
+            
+                self.draw_gui_percentage_texture_color(context,box)
+                
+                if context.scene.rtexture_turbulence: 
+                    box.prop(context.scene,"rtexture_turbulence_percentage", slider = True)
+                else:
+                    box.label(text="Texture Turbulence disabled ")
+                    
+                if context.scene.rtexture_noise_depth: 
+                    box.prop(context.scene,"rtexture_noise_depth_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Depth disabled ")
             
             if context.scene.rtexture_type=='NOISE':
             
