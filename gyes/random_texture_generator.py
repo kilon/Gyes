@@ -49,11 +49,19 @@ class random_texture_class:
         bpy.types.Scene.rtexture_nabla = BoolProperty(name= "Nabla" ,description = "Nabla of the texture" , default = True)
         bpy.types.Scene.rtexture_noise_depth = BoolProperty(name= "Noise Depth" ,description = "Noise Depth of the texture" , default = True)
         bpy.types.Scene.rtexture_noise_distortion = BoolProperty(name= "Noise Distortion" ,description = "Noise Distortion of the texture" , default = True)
+        bpy.types.Scene.rtexture_noise_intensity = BoolProperty(name= "Noise Intensity" ,description = "Noise Intensity of the texture" , default = True)
         bpy.types.Scene.rtexture_distortion = BoolProperty(name= "Distortion" ,description = "Distortion of the texture" , default = True)
         bpy.types.Scene.rtexture_turbulence = BoolProperty(name= "Turbulence" ,description = "Turbulence of the texture" , default = True)
         bpy.types.Scene.rtexture_marble_type = BoolProperty(name= "Marble Type" ,description = "Marble type of the texture" , default = True)
         bpy.types.Scene.rtexture_noise_basis_2 = BoolProperty(name= "Noise Basis" ,description = "Noise Basis of the texture" , default = True)
-        
+        bpy.types.Scene.rtexture_musgrave_type = BoolProperty(name= "Musgrave Type" ,description = "Musgrave Type of the texture" , default = True)
+        bpy.types.Scene.rtexture_lacunarity = BoolProperty(name= "Dimension Max" ,description = "Dimension Max of the texture" , default = True)
+        bpy.types.Scene.rtexture_octaves = BoolProperty(name= "Dimension Max" ,description = "Dimension Max of the texture" , default = True)
+        bpy.types.Scene.rtexture_dimension_max = BoolProperty(name= "Dimension Max" ,description = "Dimension Max of the texture" , default = True)
+        bpy.types.Scene.rtexture_offset = BoolProperty(name= "Offset" ,description = "Offset of the texture" , default = True)
+        bpy.types.Scene.rtexture_gain = BoolProperty(name= "Gain" ,description = "Gain of the texture" , default = True)
+        bpy.types.Scene.rtexture_stucci_type = BoolProperty(name= "Stucci" ,description = "Stucci type of the texture" , default = True)
+
         
         # Percentage randomisation
         bpy.types.Scene.rtexture_general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
@@ -64,9 +72,14 @@ class random_texture_class:
         bpy.types.Scene.rtexture_noise_scale_percentage = IntProperty(name="Noise Scale", description = " Noise Scale of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_nabla_percentage = IntProperty(name="Nabla", description = " Nabla of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_noise_depth_percentage = IntProperty(name="Noise Depth", description = " Noise Depth of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_noise_int_percentage = IntProperty(name="Noise Intensity", description = " Noise Intensity of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_distortion_percentage = IntProperty(name="Distortion", description = "Distortion of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_turbulence_percentage = IntProperty(name="Turbulence", description = "Turbulence of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
-        
+        bpy.types.Scene.rtexture_dimension_percentage = IntProperty(name="Dimension", description = "Dimension of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_lacunarity_percentage = IntProperty(name="Lacunarity", description = "Lacunarity of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_octaves_percentage = IntProperty(name="Octaves", description = "Octaves of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_offset_percentage = IntProperty(name="Offset", description = "Offset of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_gain_percentage = IntProperty(name="Gain", description = "Gain of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
        
         # this is the dictionary that stores history
         bpy.types.Scene.rtexture_history_index = IntProperty(name= "History Index" ,description = "The eumber of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
@@ -228,7 +241,44 @@ class random_texture_class:
             if scn.rtexture_nabla:
                 texture.nabla = self.compute_percentage(0,0.10,texture.nabla,scn.rtexture_nabla_percentage)
             
-              
+        if scn.rtexture_type == 'MUSGRAVE':
+            
+            self.random_texture_color(texture)
+            if scn.rtexture_musgrave_type:
+                texture.musgrave_type = random.choice(['MULTIFRACTAL','RIDGED_MULTIFRACTAL','HYBRID_MULTIFRACTAL','FBM','HETERO_TERRAIN'])
+            if scn.rtexture_dimension_max:
+                texture.dimension_max = self.compute_percentage(0,2,texture.dimension_max,scn.rtexture_dimension_percentage)
+            if scn.rtexture_noise_intensity:
+                texture.noise_intensity = self.compute_percentage(0,10,texture.noise_intensity,scn.rtexture_noise_int_percentage)
+            if scn.rtexture_lacunarity:
+                texture.lacunarity= self.compute_percentage(0,6,texture.lacunarity,scn.rtexture_lacunarity_percentage)
+            if scn.rtexture_noise_basis:
+                texture.noise_basis = random.choice(['BLENDER_ORIGINAL','ORIGINAL_PERLIN','IMPROVED_PERLIN','VORONOI_F1', 'VORONOI_F2','VORONOI_F3','VORONOI_F4','VORONOI_F2_F1','BLENDER_ORIGINAL','VORONOI_CRACKLE','CELL_NOISE'])
+            if scn.rtexture_noise_scale:
+                texture.noise_scale = self.compute_percentage(0,2,texture.noise_scale,scn.rtexture_noise_scale_percentage)
+            if scn.rtexture_nabla:
+                texture.nabla = self.compute_percentage(0,0.10,texture.nabla,scn.rtexture_nabla_percentage)
+            if scn.rtexture_offset:
+                texture.offset = self.compute_percentage(0,6,texture.offset,scn.rtexture_offset_percentage)
+            if scn.rtexture_gain:
+                texture.offset = self.compute_percentage(0,6,texture.gain,scn.rtexture_gain_percentage)
+            if scn.rtexture_octaves:
+                texture.octaves = self.compute_percentage(0,8,texture.octaves,scn.rtexture_octaves_percentage)      
+        
+        if scn.rtexture_type == 'STUCCI':
+            
+            self.random_texture_color(texture)
+            if scn.rtexture_stucci_type:
+                texture.stucci_type = random.choice(['PLASTIC', 'WALL_IN', 'WALL_OUT'])
+            if scn.rtexture_noise_type:
+                texture.noise_type = random.choice(['SOFT_NOISE', 'HARD_NOISE'])
+            if scn.rtexture_noise_basis:
+                texture.noise_basis = random.choice(['BLENDER_ORIGINAL','ORIGINAL_PERLIN','IMPROVED_PERLIN','VORONOI_F1', 'VORONOI_F2','VORONOI_F3','VORONOI_F4','VORONOI_F2_F1','BLENDER_ORIGINAL','VORONOI_CRACKLE','CELL_NOISE'])
+            if scn.rtexture_noise_scale:
+                texture.noise_scale = self.compute_percentage(0,2,texture.noise_scale,scn.rtexture_noise_scale_percentage)
+            if scn.rtexture_turbulence:
+                texture.turbulence = int(self.compute_percentage(0,1000,texture.turbulence,scn.rtexture_turbulence_percentage))    
+        
         if scn.rtexture_type == 'NOISE':
             
             self.random_texture_color(texture)
@@ -381,6 +431,25 @@ class random_texture_class:
                 box.prop(context.scene,"rtexture_noise_depth", toggle = True)
                 box.prop(context.scene,"rtexture_nabla", toggle = True)
                
+            if context.scene.rtexture_type=='MUSGRAVE':
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_musgrave_type", toggle = True)
+                box.prop(context.scene,"rtexture_dimension_max", toggle = True)
+                box.prop(context.scene,"rtexture_noise_intensity", toggle = True)
+                box.prop(context.scene,"rtexture_lacunarity", toggle = True)
+                box.prop(context.scene,"rtexture_octaves", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis", toggle = True)
+                box.prop(context.scene,"rtexture_noise_scale", toggle = True)
+                box.prop(context.scene,"rtexture_offset", toggle = True)
+                box.prop(context.scene,"rtexture_gain", toggle = True)
+            
+            if context.scene.rtexture_type=='STUCCI':
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_stucci_type", toggle = True)
+                box.prop(context.scene,"rtexture_noise_type", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis", toggle = True)
+                box.prop(context.scene,"rtexture_noise_scale", toggle = True)
+                box.prop(context.scene,"rtexture_turbulence", toggle = True)
             
             if context.scene.rtexture_type=='NOISE':
                 self.draw_gui_simple_texture_color(context,box)
@@ -473,7 +542,64 @@ class random_texture_class:
                     box.label(text="Texture Nabla disabled ")
                     
                
+            if context.scene.rtexture_type=='MUSGRAVE':
             
+                self.draw_gui_percentage_texture_color(context,box)
+                
+                if context.scene.rtexture_dimension_max: 
+                    box.prop(context.scene,"rtexture_dimension_percentage", slider = True)
+                else:
+                    box.label(text="Texture Dimension Max disabled ")
+                
+                if context.scene.rtexture_noise_intensity: 
+                    box.prop(context.scene,"rtexture_noise_int_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Intensity disabled ")
+                
+                if context.scene.rtexture_lacunarity: 
+                    box.prop(context.scene,"rtexture_lacunarity_percentage", slider = True)
+                else:
+                    box.label(text="Texture Lacunarity disabled ")
+                    
+                if context.scene.rtexture_octaves: 
+                    box.prop(context.scene,"rtexture_octaves_percentage", slider = True)
+                else:
+                    box.label(text="Texture Lacunarity disabled ")
+                        
+                if context.scene.rtexture_noise_scale: 
+                    box.prop(context.scene,"rtexture_noise_scale_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Scale disabled ")
+                
+                if context.scene.rtexture_nabla: 
+                    box.prop(context.scene,"rtexture_nabla_percentage", slider = True)
+                else:
+                    box.label(text="Texture Nabla disabled ")
+                    
+                if context.scene.rtexture_offset: 
+                    box.prop(context.scene,"rtexture_offset_percentage", slider = True)
+                else:
+                    box.label(text="Texture Offset disabled ")
+                    
+                if context.scene.rtexture_gain: 
+                    box.prop(context.scene,"rtexture_gain_percentage", slider = True)
+                else:
+                    box.label(text="Texture Gain disabled ")
+            
+            if context.scene.rtexture_type=='STUCCI':
+            
+                self.draw_gui_percentage_texture_color(context,box)
+                
+                if context.scene.rtexture_noise_scale: 
+                    box.prop(context.scene,"rtexture_noise_scale_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Scale disabled ")
+                
+                if context.scene.rtexture_turbulence: 
+                    box.prop(context.scene,"rtexture_turbulence_percentage", slider = True)
+                else:
+                    box.label(text="Texture Turbulence disabled ")
+                    
             if context.scene.rtexture_type=='NOISE':
             
                 self.draw_gui_percentage_texture_color(context,box)
@@ -543,6 +669,6 @@ class gyes_random_texture(bpy.types.Operator):
 def register():
     bpy.utils.register_class(gyes_random_texture)
 def unregister():
-    bpy.utils.unregister_class(gyes_random_material)
+    bpy.utils.unregister_class(gyes_random_texture)
 if __name__ == '__main__':
     register()
