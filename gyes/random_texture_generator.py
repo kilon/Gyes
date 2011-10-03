@@ -51,6 +51,8 @@ class random_texture_class:
         bpy.types.Scene.rtexture_noise_distortion = BoolProperty(name= "Noise Distortion" ,description = "Noise Distortion of the texture" , default = True)
         bpy.types.Scene.rtexture_distortion = BoolProperty(name= "Distortion" ,description = "Distortion of the texture" , default = True)
         bpy.types.Scene.rtexture_turbulence = BoolProperty(name= "Turbulence" ,description = "Turbulence of the texture" , default = True)
+        bpy.types.Scene.rtexture_marble_type = BoolProperty(name= "Marble Type" ,description = "Marble type of the texture" , default = True)
+        bpy.types.Scene.rtexture_noise_basis_2 = BoolProperty(name= "Noise Basis" ,description = "Noise Basis of the texture" , default = True)
         
         
         # Percentage randomisation
@@ -206,6 +208,26 @@ class random_texture_class:
             if scn.rtexture_turbulence:
                 texture.turbulence = int(self.compute_percentage(0,1000,texture.turbulence,scn.rtexture_turbulence_percentage))    
             
+        if scn.rtexture_type == 'MARBLE':
+            
+            self.random_texture_color(texture)
+            if scn.rtexture_marble_type:
+                texture.marble_type = random.choice(['SOFT', 'SHARP', 'SHARPER'])
+            if scn.rtexture_noise_basis_2:
+                texture.noise_basis_2 = random.choice(['SIN', 'SAW', 'TRI'])
+            if scn.rtexture_noise_type:
+                texture.noise_type = random.choice(['SOFT_NOISE', 'HARD_NOISE'])
+            if scn.rtexture_noise_basis:
+                texture.noise_basis = random.choice(['BLENDER_ORIGINAL','ORIGINAL_PERLIN','IMPROVED_PERLIN','VORONOI_F1', 'VORONOI_F2','VORONOI_F3','VORONOI_F4','VORONOI_F2_F1','BLENDER_ORIGINAL','VORONOI_CRACKLE','CELL_NOISE'])
+            if scn.rtexture_noise_scale:
+                texture.noise_scale = self.compute_percentage(0,2,texture.noise_scale,scn.rtexture_noise_scale_percentage)
+            if scn.rtexture_turbulence:
+                texture.turbulence = int(self.compute_percentage(0,1000,texture.turbulence,scn.rtexture_turbulence_percentage))    
+            if scn.rtexture_noise_depth:
+                texture.noise_depth = int(self.compute_percentage(0,24,texture.noise_depth,scn.rtexture_noise_depth_percentage))
+            if scn.rtexture_nabla:
+                texture.nabla = self.compute_percentage(0,0.10,texture.nabla,scn.rtexture_nabla_percentage)
+            
               
         if scn.rtexture_type == 'NOISE':
             
@@ -322,34 +344,46 @@ class random_texture_class:
             box.prop(context.scene,"rtexture_type")
             
             if context.scene.rtexture_type=='BLEND':
-               self.draw_gui_simple_texture_color(context,box)
-               box.prop(context.scene,"rtexture_progression", toggle = True)
-               box.prop(context.scene,"rtexture_axis", toggle = True)
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_progression", toggle = True)
+                box.prop(context.scene,"rtexture_axis", toggle = True)
             
             if context.scene.rtexture_type=='CLOUDS':
-               self.draw_gui_simple_texture_color(context,box)
-               box.prop(context.scene,"rtexture_noise_type", toggle = True)
-               box.prop(context.scene,"rtexture_cloud_type", toggle = True)
-               box.prop(context.scene,"rtexture_noise_basis", toggle = True)
-               box.prop(context.scene,"rtexture_noise_scale", toggle = True)
-               box.prop(context.scene,"rtexture_nabla", toggle = True)
-               box.prop(context.scene,"rtexture_noise_depth", toggle = True)
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_noise_type", toggle = True)
+                box.prop(context.scene,"rtexture_cloud_type", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis", toggle = True)
+                box.prop(context.scene,"rtexture_noise_scale", toggle = True)
+                box.prop(context.scene,"rtexture_nabla", toggle = True)
+                box.prop(context.scene,"rtexture_noise_depth", toggle = True)
             
             if context.scene.rtexture_type=='DISTORTED_NOISE':
-               self.draw_gui_simple_texture_color(context,box)
-               box.prop(context.scene,"rtexture_noise_distortion", toggle = True)
-               box.prop(context.scene,"rtexture_noise_basis", toggle = True)
-               box.prop(context.scene,"rtexture_distortion", toggle = True)
-               box.prop(context.scene,"rtexture_nabla", toggle = True)
-               box.prop(context.scene,"rtexture_noise_scale", toggle = True)   
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_noise_distortion", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis", toggle = True)
+                box.prop(context.scene,"rtexture_distortion", toggle = True)
+                box.prop(context.scene,"rtexture_nabla", toggle = True)
+                box.prop(context.scene,"rtexture_noise_scale", toggle = True)   
             
             if context.scene.rtexture_type=='MAGIC':
-               self.draw_gui_simple_texture_color(context,box)
-               box.prop(context.scene,"rtexture_turbulence", toggle = True)
-               box.prop(context.scene,"rtexture_noise_depth", toggle = True)
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_turbulence", toggle = True)
+                box.prop(context.scene,"rtexture_noise_depth", toggle = True)
+            
+            if context.scene.rtexture_type=='MARBLE':
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_marble_type", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis_2", toggle = True)
+                box.prop(context.scene,"rtexture_noise_type", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis", toggle = True)
+                box.prop(context.scene,"rtexture_noise_scale", toggle = True)
+                box.prop(context.scene,"rtexture_turbulence", toggle = True)
+                box.prop(context.scene,"rtexture_noise_depth", toggle = True)
+                box.prop(context.scene,"rtexture_nabla", toggle = True)
+               
             
             if context.scene.rtexture_type=='NOISE':
-               self.draw_gui_simple_texture_color(context,box)
+                self.draw_gui_simple_texture_color(context,box)
                
                            
             box.prop(context.scene,"rtexture_general_percentage", slider = True)
@@ -413,6 +447,32 @@ class random_texture_class:
                     box.prop(context.scene,"rtexture_noise_depth_percentage", slider = True)
                 else:
                     box.label(text="Texture Noise Depth disabled ")
+            
+            if context.scene.rtexture_type=='MARBLE':
+            
+                self.draw_gui_percentage_texture_color(context,box)
+                
+                if context.scene.rtexture_noise_scale: 
+                    box.prop(context.scene,"rtexture_noise_scale_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Scale disabled ")
+                
+                if context.scene.rtexture_turbulence: 
+                    box.prop(context.scene,"rtexture_turbulence_percentage", slider = True)
+                else:
+                    box.label(text="Texture Turbulence disabled ")
+                
+                if context.scene.rtexture_noise_depth: 
+                    box.prop(context.scene,"rtexture_noise_depth_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Depth disabled ")
+                
+                if context.scene.rtexture_nabla: 
+                    box.prop(context.scene,"rtexture_nabla_percentage", slider = True)
+                else:
+                    box.label(text="Texture Nabla disabled ")
+                    
+               
             
             if context.scene.rtexture_type=='NOISE':
             
