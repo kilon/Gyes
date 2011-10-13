@@ -21,7 +21,7 @@
 
 bl_info = {
     "name": "Gyes (A Blender MultiTool)",
-    "description": "Gyes is a collection of scripts that simplify , automate and extend blender",
+    "description": "Gyes is a collection of scripts, named <tools> that simplify , automate and extend blender",
     "author": "Kilon",
     "version": (0,5),
     "blender": (2, 5, 9),
