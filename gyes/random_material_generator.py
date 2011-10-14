@@ -204,7 +204,10 @@ class random_material_class:
         
         if scn.rtexture :
             self.random_textures(mat)
-     
+        
+        if scn.rtexture :
+            bpy.ops.gyes.random_texture()
+            
         mat.ambient = self.compute_percentage(0,1, mat.ambient, scn.general_percentage)
         
         # after you finishes randomisation store the random material to history

@@ -24,17 +24,18 @@ class random_texture_class:
 ('BLEND','BLEND','BLEND'),
 ('CLOUDS','CLOUDS','CLOUDS'),
 ('DISTORTED_NOISE','DISTORTED_NOISE','DISTORTED_NOISE'),
-('ENVIRONMENT_MAP','ENVIRONMENT_MAP','ENVIRONMENT_MAP'),
-('IMAGE','IMAGE','IMAGE'),
+#('ENVIRONMENT_MAP','ENVIRONMENT_MAP','ENVIRONMENT_MAP'),
+#('IMAGE','IMAGE','IMAGE'),
 ('MAGIC','MAGIC','MAGIC'),
 ('MARBLE','MARBLE','MARBLE'),
 ('MUSGRAVE','MUSGRAVE','MUSGRAVE'),
 ('NOISE','NOISE','NOISE'),
-('POINT_DENSITY','POINT_DENSITY','POINT_DENSITY'),
-('STUCCI','STUCCI','STUCCI'),
-('VORONOI','VORONOI','VORONOI'),
-('VOXEL_DATA','VOXEL_DATA','VOXEL_DATA'),
-('WOOD','WOOD','WOOD')), default='RANDOM')
+#('POINT_DENSITY','POINT_DENSITY','POINT_DENSITY'),
+('STUCCI','STUCCI','STUCCI')), default='RANDOM')
+#('VORONOI','VORONOI','VORONOI'),
+#('VOXEL_DATA','VOXEL_DATA','VOXEL_DATA') 
+#('WOOD','WOOD','WOOD')
+
 
         bpy.types.Scene.rtexture_color = BoolProperty(name= "Color Factor" ,description = "Color factor of the texture" , default = True)    
         bpy.types.Scene.rtexture_intensity = BoolProperty(name= "Intensity" ,description = "Intensity of the texture" , default = True)
@@ -159,8 +160,7 @@ class random_texture_class:
             if not scn.rtexture_type=='RANDOM':
                texture.type = scn.rtexture_type
             else:
-               scn.rtexture_type = random.choice(['BLEND','CLOUDS','DISTORTED_NOISE','ENVIRONMENT_MAP','IMAGE','MAGIC','MARBLE','MUSGRAVE','NOISE','POINT_DENSITY','STUCCI','VORONOI','VOXEL_DATA','WOOD'])
-               texture.type = scn.rtexture_type
+               texture.type = random.choice(['BLEND','CLOUDS','DISTORTED_NOISE','MAGIC','MARBLE','MUSGRAVE','NOISE','STUCCI'])
             material.texture_slots[material.active_texture_index].texture = texture 
         else:
             material.texture_slots.create(material.active_texture_index)           
