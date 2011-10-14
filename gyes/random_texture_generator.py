@@ -164,7 +164,7 @@ class random_texture_class:
             material.texture_slots[material.active_texture_index].texture = texture 
         else:
             material.texture_slots.create(material.active_texture_index)           
-            if not scn.rtexture_type=='Random':
+            if not scn.rtexture_type=='RANDOM':
                 texture = bpy.data.textures.new('Rand_tex_',scn.rtexture_type)
             else:
                 texture = bpy.data.textures.new('Rand_tex_','NOISE')
