@@ -31,8 +31,9 @@ class random_texture_class:
 ('MUSGRAVE','MUSGRAVE','MUSGRAVE'),
 ('NOISE','NOISE','NOISE'),
 #('POINT_DENSITY','POINT_DENSITY','POINT_DENSITY'),
-('STUCCI','STUCCI','STUCCI')), default='RANDOM')
-#('VORONOI','VORONOI','VORONOI'),
+('STUCCI','STUCCI','STUCCI'),
+('VORONOI','VORONOI','VORONOI')), default='RANDOM')
+
 #('VOXEL_DATA','VOXEL_DATA','VOXEL_DATA') 
 #('WOOD','WOOD','WOOD')
 
@@ -61,8 +62,14 @@ class random_texture_class:
         bpy.types.Scene.rtexture_dimension_max = BoolProperty(name= "Dimension Max" ,description = "Dimension Max of the texture" , default = True)
         bpy.types.Scene.rtexture_offset = BoolProperty(name= "Offset" ,description = "Offset of the texture" , default = True)
         bpy.types.Scene.rtexture_gain = BoolProperty(name= "Gain" ,description = "Gain of the texture" , default = True)
-        bpy.types.Scene.rtexture_stucci_type = BoolProperty(name= "Stucci" ,description = "Stucci type of the texture" , default = True)
-
+        bpy.types.Scene.rtexture_stucci_type = BoolProperty(name= "Type" ,description = "Stucci type of the texture" , default = True)
+        bpy.types.Scene.rtexture_dist_metric = BoolProperty(name= "Metric" ,description = "Distance Metric of the texture" , default = True)
+        bpy.types.Scene.rtexture_exponent = BoolProperty(name= "Exponent" ,description = "Minkovsky Exponent of the texture" , default = True)
+        bpy.types.Scene.rtexture_color_mode = BoolProperty(name= "Color Mode" ,description = "Color Mode of the texture" , default = True)
+        bpy.types.Scene.rtexture_weight_1 = BoolProperty(name= "Weight 1" ,description = "Weight 1 of the texture" , default = True)
+        bpy.types.Scene.rtexture_weight_2 = BoolProperty(name= "Weight 2" ,description = "Weight 2 of the texture" , default = True)
+        bpy.types.Scene.rtexture_weight_3 = BoolProperty(name= "Weight 3" ,description = "Weight 3 of the texture" , default = True)
+        bpy.types.Scene.rtexture_weight_4 = BoolProperty(name= "Weight 4" ,description = "Weight 4 of the texture" , default = True)
         
         # Percentage randomisation
         bpy.types.Scene.rtexture_general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
@@ -81,6 +88,11 @@ class random_texture_class:
         bpy.types.Scene.rtexture_octaves_percentage = IntProperty(name="Octaves", description = "Octaves of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_offset_percentage = IntProperty(name="Offset", description = "Offset of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_gain_percentage = IntProperty(name="Gain", description = "Gain of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_exponent_percentage = IntProperty(name="Exponent", description = "Exponent of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_weight_1_percentage = IntProperty(name="Weight 1", description = "Weight 1 of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_weight_2_percentage = IntProperty(name="Weight 2", description = "Weight 2 of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_weight_3_percentage = IntProperty(name="Weight 3", description = "Weight 3 of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
+        bpy.types.Scene.rtexture_weight_4_percentage = IntProperty(name="Weight 4", description = "Weight 4 of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
        
         # this is the dictionary that stores history
         bpy.types.Scene.rtexture_history_index = IntProperty(name= "History Index" ,description = "The eumber of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
@@ -279,6 +291,31 @@ class random_texture_class:
             if scn.rtexture_turbulence:
                 texture.turbulence = int(self.compute_percentage(0,1000,texture.turbulence,scn.rtexture_turbulence_percentage))    
         
+        
+        if scn.rtexture_type == 'VORONOI':
+            
+            self.random_texture_color(texture)
+            if scn.rtexture_dist_metric:
+                texture.distance_metric = random.choice(['DISTANCE', 'DISTANCE_SQUARED', 'MANHATTAN', 'CHEBYCHEV', 'MINKOVSKY_HALF', 'MINKOVSKY_FOUR', 'MINKOVSKY'])
+            if scn.rtexture_noise_type:
+                texture.color_mode = random.choice(['INTENSITY', 'POSITION', 'POSITION_OUTLINE', 'POSITION_OUTLINE_INTENSITY'])
+            if scn.rtexture_exponent:
+                texture.minkovsky_exponent = self.compute_percentage(0,2,texture.minkovsky_exponent ,scn.rtexture_exponent_percentage)
+            if scn.rtexture_noise_intensity:
+                texture.noise_intensity = self.compute_percentage(0,10,texture.noise_intensity,scn.rtexture_noise_int_percentage)
+            if scn.rtexture_noise_scale:
+                texture.noise_scale = self.compute_percentage(0,2,texture.noise_scale,scn.rtexture_noise_scale_percentage)
+            if scn.rtexture_nabla:
+                texture.nabla = self.compute_percentage(0,0.10,texture.nabla,scn.rtexture_nabla_percentage)
+            if scn.rtexture_weight_1:
+                texture.weight_1 = self.compute_percentage(-2,2,texture.weight_1,scn.rtexture_weight_1_percentage)
+            if scn.rtexture_weight_2:
+                texture.weight_2 = self.compute_percentage(-2,2,texture.weight_2,scn.rtexture_weight_2_percentage)
+            if scn.rtexture_weight_3:
+                texture.weight_3 = self.compute_percentage(-2,2,texture.weight_3,scn.rtexture_weight_3_percentage)
+            if scn.rtexture_weight_4:
+                texture.weight_4 = self.compute_percentage(-2,2,texture.weight_4,scn.rtexture_weight_4_percentage) 
+                   
         if scn.rtexture_type == 'NOISE':
             
             self.random_texture_color(texture)
@@ -451,6 +488,18 @@ class random_texture_class:
                 box.prop(context.scene,"rtexture_noise_scale", toggle = True)
                 box.prop(context.scene,"rtexture_turbulence", toggle = True)
             
+            if context.scene.rtexture_type=='VORONOI':
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_metric", toggle = True)
+                box.prop(context.scene,"rtexture_exponent", toggle = True)
+                box.prop(context.scene,"rtexture_noise_intensity", toggle = True)
+                box.prop(context.scene,"rtexture_noise_scale", toggle = True)
+                box.prop(context.scene,"rtexture_nablae", toggle = True)
+                box.prop(context.scene,"rtexture_weight_1", toggle = True)
+                box.prop(context.scene,"rtexture_weight_2", toggle = True)
+                box.prop(context.scene,"rtexture_weight_3", toggle = True)
+                box.prop(context.scene,"rtexture_weight_4", toggle = True)
+            
             if context.scene.rtexture_type=='NOISE':
                 self.draw_gui_simple_texture_color(context,box)
                
@@ -600,6 +649,50 @@ class random_texture_class:
                 else:
                     box.label(text="Texture Turbulence disabled ")
                     
+            if context.scene.rtexture_type=='VORONOI':
+            
+                self.draw_gui_percentage_texture_color(context,box)
+                
+                if context.scene.rtexture_exponent: 
+                    box.prop(context.scene,"rtexture_exponent_percentage", slider = True)
+                else:
+                    box.label(text="Texture Exponent disabled ")
+                
+                if context.scene.rtexture_noise_intensity: 
+                    box.prop(context.scene,"rtexture_noise_int_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Intensity disabled ")
+                    
+                if context.scene.rtexture_noise_scale: 
+                    box.prop(context.scene,"rtexture_noise_scale_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Scale disabled ")
+                
+                if context.scene.rtexture_nabla: 
+                    box.prop(context.scene,"rtexture_nabla_percentage", slider = True)
+                else:
+                    box.label(text="Texture Weight 1 disabled ")
+                    
+                if context.scene.rtexture_weight_1: 
+                    box.prop(context.scene,"rtexture_weight_1_percentage", slider = True)
+                else:
+                    box.label(text="Texture Weight 1 disabled ")
+                    
+                if context.scene.rtexture_weight_2: 
+                    box.prop(context.scene,"rtexture_weight_2_percentage", slider = True)
+                else:
+                    box.label(text="Texture Weight 2 disabled ")
+                
+                if context.scene.rtexture_weight_3: 
+                    box.prop(context.scene,"rtexture_weight_3_percentage", slider = True)
+                else:
+                    box.label(text="Texture Weight 3 disabled ")
+                
+                if context.scene.rtexture_weight_4: 
+                    box.prop(context.scene,"rtexture_weight_4_percentage", slider = True)
+                else:
+                    box.label(text="Texture Weight 4 disabled ")
+            
             if context.scene.rtexture_type=='NOISE':
             
                 self.draw_gui_percentage_texture_color(context,box)
