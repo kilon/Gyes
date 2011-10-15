@@ -203,9 +203,6 @@ class random_material_class:
                 mat.specular_alpha= random.random()
         
         if scn.rtexture :
-            self.random_textures(mat)
-        
-        if scn.rtexture :
             bpy.ops.gyes.random_texture()
             
         mat.ambient = self.compute_percentage(0,1, mat.ambient, scn.general_percentage)
@@ -215,14 +212,7 @@ class random_material_class:
           
         return mat
 
-    # randomise textures
-    def random_textures(self,mat):
-        
-        # if there is an available texture , randomise that one
-        if mat.texture_slots[0] and mat.texture_slots[0].texture:
-            if mat.texture_slots[0].texture:    
-                print("randomising textures")
-  
+   
     #store active material to history
     def store_to_history(self, mat):
         scn = bpy.context.scene
@@ -395,7 +385,7 @@ class random_material_class:
                                 
         # Display the History Gui for all modes
         
-        layout.label(text="History")
+        layout.label(text="History (RMG + RTG)")
         history_box= layout.box()
         history_box.prop(context.scene, "history_index")
         row = history_box.row()

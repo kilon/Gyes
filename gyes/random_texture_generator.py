@@ -32,11 +32,9 @@ class random_texture_class:
 ('NOISE','NOISE','NOISE'),
 #('POINT_DENSITY','POINT_DENSITY','POINT_DENSITY'),
 ('STUCCI','STUCCI','STUCCI'),
-('VORONOI','VORONOI','VORONOI')), default='RANDOM')
-
+('VORONOI','VORONOI','VORONOI'),
+('WOOD','WOOD','WOOD')), default='RANDOM')
 #('VOXEL_DATA','VOXEL_DATA','VOXEL_DATA') 
-#('WOOD','WOOD','WOOD')
-
 
         bpy.types.Scene.rtexture_color = BoolProperty(name= "Color Factor" ,description = "Color factor of the texture" , default = True)    
         bpy.types.Scene.rtexture_intensity = BoolProperty(name= "Intensity" ,description = "Intensity of the texture" , default = True)
@@ -70,6 +68,7 @@ class random_texture_class:
         bpy.types.Scene.rtexture_weight_2 = BoolProperty(name= "Weight 2" ,description = "Weight 2 of the texture" , default = True)
         bpy.types.Scene.rtexture_weight_3 = BoolProperty(name= "Weight 3" ,description = "Weight 3 of the texture" , default = True)
         bpy.types.Scene.rtexture_weight_4 = BoolProperty(name= "Weight 4" ,description = "Weight 4 of the texture" , default = True)
+        bpy.types.Scene.rtexture_wood_type = BoolProperty(name= "Wood Type" ,description = "Wood Type of the texture" , default = True)
         
         # Percentage randomisation
         bpy.types.Scene.rtexture_general_percentage = IntProperty(name="General percentage", description = " General percentage of randomisation" , min = 0 , max = 100 , default = 100, subtype = 'PERCENTAGE')
@@ -94,21 +93,12 @@ class random_texture_class:
         bpy.types.Scene.rtexture_weight_3_percentage = IntProperty(name="Weight 3", description = "Weight 3 of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
         bpy.types.Scene.rtexture_weight_4_percentage = IntProperty(name="Weight 4", description = "Weight 4 of the texture" , min = 0 , max = 100 , default = 0, subtype = 'PERCENTAGE')
        
-        # this is the dictionary that stores history
-        bpy.types.Scene.rtexture_history_index = IntProperty(name= "History Index" ,description = "The eumber of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
-        self.history={}
-        self.delete_start_index=1
+        
         
         # the prop that controls the text wrap in help menu
         bpy.types.Scene.text_width = IntProperty(name = "Text Width" , description = "The width above which the text wraps" , default = 20 , max = 180 , min = 1)
         
-        # here is where history dictionary is saved with the blend file
-        # if the backup is already saved with the blend file it is used 
-        # to restory the history dictionary , if not it is created
         
-        if hasattr(bpy.context.scene , "texture_historybak")==False:
-            bpy.types.Scene.texture_historybak = StringProperty()
-            print("created history backup")
             
          # non read only material properties where keyframes can be inserted or removed
         self.animated_properties=["alpha",
@@ -172,7 +162,7 @@ class random_texture_class:
             if not scn.rtexture_type=='RANDOM':
                texture.type = scn.rtexture_type
             else:
-               texture.type = random.choice(['BLEND','CLOUDS','DISTORTED_NOISE','MAGIC','MARBLE','MUSGRAVE','NOISE','STUCCI'])
+               texture.type = random.choice(['BLEND','CLOUDS','DISTORTED_NOISE','MAGIC','MARBLE','MUSGRAVE','NOISE','STUCCI','VORONOI','WOOD'])
             material.texture_slots[material.active_texture_index].texture = texture 
         else:
             material.texture_slots.create(material.active_texture_index)           
@@ -315,6 +305,24 @@ class random_texture_class:
                 texture.weight_3 = self.compute_percentage(-2,2,texture.weight_3,scn.rtexture_weight_3_percentage)
             if scn.rtexture_weight_4:
                 texture.weight_4 = self.compute_percentage(-2,2,texture.weight_4,scn.rtexture_weight_4_percentage) 
+        
+        if scn.rtexture_type == 'WOOD':
+            
+            self.random_texture_color(texture)
+            if scn.rtexture_wood_type:
+                texture.wood_type = random.choice(['BANDS', 'RINGS', 'BANDNOISE', 'RINGNOISE'])
+            if scn.rtexture_noise_basis_2:
+                texture.noise_basis_2 = random.choice(['SIN', 'SAW', 'TRI'])
+            if scn.rtexture_noise_type:
+                texture.noise_type = random.choice(['SOFT_NOISE', 'HARD_NOISE'])
+            if scn.rtexture_noise_basis:
+                texture.noise_basis = random.choice(['BLENDER_ORIGINAL','ORIGINAL_PERLIN','IMPROVED_PERLIN','VORONOI_F1', 'VORONOI_F2','VORONOI_F3','VORONOI_F4','VORONOI_F2_F1','BLENDER_ORIGINAL','VORONOI_CRACKLE','CELL_NOISE'])
+            if scn.rtexture_noise_scale:
+                texture.noise_scale = self.compute_percentage(0,2,texture.noise_scale,scn.rtexture_noise_scale_percentage)
+            if scn.rtexture_turbulence:
+                texture.turbulence = int(self.compute_percentage(0,1000,texture.turbulence,scn.rtexture_turbulence_percentage))    
+            if scn.rtexture_nabla:
+                texture.nabla = self.compute_percentage(0,0.10,texture.nabla,scn.rtexture_nabla_percentage)
                    
         if scn.rtexture_type == 'NOISE':
             
@@ -333,54 +341,7 @@ class random_texture_class:
         texture.use_fake_user = True
                  
         bpy.context.scene.texture_historybak = str(self.history)
-    """    
-    # Activate. Make active material the particular history index the user has chosen
-    def activate(self, random_assign = False):
-        
-        for i in bpy.context.selected_objects :
-            if random_assign == False and i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history ) and rm.rm_history[bpy.context.scene.history_index]:                
-                scn = bpy.context.scene
-                mat = i.active_material
-                index = scn.history_index
-                
-            if random_assign == True and i.type == 'MESH' :
-            
-                index = round(len(self.rm_history) * random.random())
-                
-                if index == 0 :
-                    index = 1
-                    
-                scn = bpy.context.scene
-                mat = i.active_material
-                scn.history_index=index
-                
-            material_slots_backup =[]    
-            material_slots_len = len(i.material_slots)
-            
-            for x in range(0,material_slots_len):
-                print("x = ",x)
-                if x==0:
-                    print("appending stored material")
-                    i.active_material_index=material_slots_len-1
-                    i.data.materials.append(bpy.data.materials[self.rm_history[index]["name"]])
-                    i.active_material_index=0
-                    bpy.ops.object.material_slot_remove()
-                
-                else:
-                    print("deleting materials")
-                    i.active_material_index=0
-                    material_slots_backup.append(i.material_slots[0].material.name)
-                    print("backup : "+i.material_slots[0].material.name)
-                    bpy.ops.object.material_slot_remove()
-                    
-            
-            i.active_material_index=0
-            for y in range(0,len(material_slots_backup)):
-                i.active_material_index=y
-                i.data.materials.append(bpy.data.materials[material_slots_backup[y]])
-            i.active_material_index=0
-                  
- """
+    
     # a nice multi label                        
     def multi_label(self, text, ui,text_width):
         
@@ -419,7 +380,7 @@ class random_texture_class:
     
         
             
-    def draw_gui(self ,context,panel):
+    def draw_gui(self ,context,panel,rm):
         layout = panel.layout
         row = layout.row()
         row.prop(context.scene , "rtexture_gui_mode" )
@@ -499,6 +460,16 @@ class random_texture_class:
                 box.prop(context.scene,"rtexture_weight_2", toggle = True)
                 box.prop(context.scene,"rtexture_weight_3", toggle = True)
                 box.prop(context.scene,"rtexture_weight_4", toggle = True)
+            
+            if context.scene.rtexture_type=='WOOD':
+                self.draw_gui_simple_texture_color(context,box)
+                box.prop(context.scene,"rtexture_wood_type", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis_2", toggle = True)
+                box.prop(context.scene,"rtexture_noise_type", toggle = True)
+                box.prop(context.scene,"rtexture_noise_basis", toggle = True)
+                box.prop(context.scene,"rtexture_noise_scale", toggle = True)
+                box.prop(context.scene,"rtexture_turbulence", toggle = True)
+                box.prop(context.scene,"rtexture_nabla", toggle = True)
             
             if context.scene.rtexture_type=='NOISE':
                 self.draw_gui_simple_texture_color(context,box)
@@ -693,6 +664,25 @@ class random_texture_class:
                 else:
                     box.label(text="Texture Weight 4 disabled ")
             
+            if context.scene.rtexture_type=='WOOD':
+            
+                self.draw_gui_percentage_texture_color(context,box)
+                
+                if context.scene.rtexture_noise_scale: 
+                    box.prop(context.scene,"rtexture_noise_scale_percentage", slider = True)
+                else:
+                    box.label(text="Texture Noise Scale disabled ")
+                
+                if context.scene.rtexture_turbulence: 
+                    box.prop(context.scene,"rtexture_turbulence_percentage", slider = True)
+                else:
+                    box.label(text="Texture Turbulence disabled ")
+                
+                if context.scene.rtexture_nabla: 
+                    box.prop(context.scene,"rtexture_nabla_percentage", slider = True)
+                else:
+                    box.label(text="Texture Nabla disabled ")
+            
             if context.scene.rtexture_type=='NOISE':
             
                 self.draw_gui_percentage_texture_color(context,box)
@@ -737,6 +727,45 @@ class random_texture_class:
             w=bpy.context.scene.text_width
             box.prop(context.scene,"text_width", slider =True)
             self.multi_label(help_text,box,w) 
+        
+        # Display the History Gui for all modes
+        
+        layout.label(text="History (RMG + RTG)")
+        history_box= layout.box()
+        history_box.prop(context.scene, "history_index")
+        row = history_box.row()
+        row.operator("gyes.first")
+        row.operator("gyes.previous")
+        row.operator("gyes.next")
+        row.operator("gyes.last")
+        rm_index = context.scene.history_index
+        
+        if rm_index in rm.rm_history and rm.rm_history[rm_index] :
+            row = history_box.row()
+            a = row.split(percentage = 0.3, align = True)
+            a.operator("gyes.activate")
+            a.operator("gyes.animate")
+            b=a.split(percentage = 0.3, align = True)
+            b.operator("gyes.x")
+            b.operator("gyes.random_activate")                       
+        else:
+            history_box.label(text= "Empty Index ! ")
+        
+        if context.scene.history_index < len(rm.rm_history)+2:
+            history_box.operator("gyes.store")
+        else:
+            history_box.label(text= "Not the first Empty Index")
+            
+        if rm_index in rm.rm_history and rm.rm_history[rm_index] :
+            history_box.operator("gyes.delete")
+            row2 = history_box.row()
+            row2.operator("gyes.delete_start")
+            row2.operator("gyes.delete_end")
+            
+        if hasattr(bpy.context.scene,"historybak") and bpy.context.scene.historybak!='':
+            history_box.operator("gyes.restore")
+        else:
+            history_box.label(text="Backup not Found")
                                 
 rt =random_texture_class()
 

@@ -79,7 +79,7 @@ class gyes_panel(bpy.types.Panel):
             rm.draw_gui(context,self)
         
         if context.scene.tool == 'RTG' :
-            rt.draw_gui(context,self)
+            rt.draw_gui(context,self,rm)
  
         r = layout.row()
         if context.scene.tool == 'RLG' :
