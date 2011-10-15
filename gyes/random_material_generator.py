@@ -243,31 +243,14 @@ class random_material_class:
                 mat = i.active_material
                 scn.history_index=index
                 
-            material_slots_backup =[]    
-            material_slots_len = len(i.material_slots)
+              
+            if len(i.material_slots) == 0:
+                print("no slot found creating a new one")
+                i.active_material= bpy.data.materials[self.rm_history[index]["name"]]
+            else:
+                print("found slot assigning material")
+                i.material_slots[i.active_material_index].material= bpy.data.materials[self.rm_history[index]["name"]]
             
-            for x in range(0,material_slots_len):
-                print("x = ",x)
-                if x==0:
-                    print("appending stored material")
-                    i.active_material_index=material_slots_len-1
-                    i.data.materials.append(bpy.data.materials[self.rm_history[index]["name"]])
-                    i.active_material_index=0
-                    bpy.ops.object.material_slot_remove()
-                
-                else:
-                    print("deleting materials")
-                    i.active_material_index=0
-                    material_slots_backup.append(i.material_slots[0].material.name)
-                    print("backup : "+i.material_slots[0].material.name)
-                    bpy.ops.object.material_slot_remove()
-                    
-            
-            i.active_material_index=0
-            for y in range(0,len(material_slots_backup)):
-                i.active_material_index=y
-                i.data.materials.append(bpy.data.materials[material_slots_backup[y]])
-            i.active_material_index=0
                    
     # a nice multi label                        
     def multi_label(self, text, ui,text_width):
