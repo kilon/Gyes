@@ -687,10 +687,10 @@ def draw_librarian():
     #bgl.glBegin(bgl.GL_LINES)
     bgl.glRecti(5,5,bpy.context.area.regions[4].width-5, bpy.context.area.regions[4].height-5)
     #bgl.glEnd()
-    x1 = 100
-    y1 = 100
-    x2 = 300
-    y2 = 300
+    x1 = 50
+    y1 = 50
+    x2 = bpy.context.area.regions[4].width-50
+    y2 = bpy.context.area.regions[4].height-50
     color=[0.5,0.5,0.5,1]
     if len(bpy.data.images)>0:
         img = bpy.data.images[0]
