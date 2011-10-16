@@ -681,26 +681,53 @@ def draw_librarian():
     
 
     #set colour to use
-    bgl.glColor4f(0.5,0.5,0.5,1)
+    bgl.glColor4f(0.5,0.0,0.5,0.7)
 
     #draw main line and handles
     #bgl.glBegin(bgl.GL_LINES)
-    bgl.glRecti(5,5,bpy.context.area.width - 165, bpy.context.area.height-30)
+    bgl.glRecti(5,5,bpy.context.area.regions[4].width-5, bpy.context.area.regions[4].height-5)
     #bgl.glEnd()
-    print (bpy.context.area.width)
+    x1 = 100
+    y1 = 100
+    x2 = 300
+    y2 = 300
+    color=[0.5,0.5,0.5,1]
+    img = bpy.data.images[0]
+    img.gl_load(bgl.GL_NEAREST, bgl.GL_NEAREST)
+    bgl.glBindTexture(bgl.GL_TEXTURE_2D, img.bindcode)
+    bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MIN_FILTER, bgl.GL_NEAREST)
+
+    bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MAG_FILTER, bgl.GL_NEAREST)
+    bgl.glEnable(bgl.GL_TEXTURE_2D)
+    bgl.glEnable(bgl.GL_BLEND)
+    #bgl.glBlendFunc(bgl.GL_SRC_ALPHA, bgl.GL_ONE_MINUS_SRC_ALPHA)
+    bgl.glColor4f(color[0], color[1], color[2], color[3])
+    bgl.glBegin(bgl.GL_QUADS)
+    bgl.glTexCoord2f(0,0)
+    bgl.glVertex2f(x1,y1)
+    bgl.glTexCoord2f(0,1)
+    bgl.glVertex2f(x1,y2)
+    bgl.glTexCoord2f(1,1)
+    bgl.glVertex2f(x2,y2)
+    bgl.glTexCoord2f(1,0)
+    bgl.glVertex2f(x2,y1)
+    bgl.glEnd()
+    bgl.glDisable(bgl.GL_BLEND)
+    bgl.glDisable(bgl.GL_TEXTURE_2D)
 
 
 
-def DrawStringToViewport(my_string, pos_x, pos_y, size, colour_type):
+
+def DrawStringToViewport(text, x, y, size, color):
     ''' my_string : the text we want to print
         pos_x, pos_y : coordinates in integer values
         size : font height.
         colour_type : used for definining the colour'''
     my_dpi, font_id = 72, 0 # dirty fast assignment
-    bgl.glColor4f(*colour_type)
-    blf.position(font_id, pos_x, pos_y, 0)
+    bgl.glColor4f(*color)
+    blf.position(font_id, x, y, 0)
     blf.size(font_id, size, my_dpi)
-    blf.draw(font_id, my_string)
+    blf.draw(font_id, text)
 
 
 def InitViewportText(self, context):
@@ -713,7 +740,7 @@ def InitViewportText(self, context):
     DrawStringToViewport("Material Templates Librarian version 0.01", 100, bpy.context.area.height-70, 20, dimension_colour)
     
     DrawStringToViewport(explanation_string, 10, 7, 40, explanation_colour)
-
+    DrawStringToViewport("Region : "+ bpy.context.area.regions[4].type, 10, 100, 20, explanation_colour)
 
 def InitGLOverlay(self, context):
     
