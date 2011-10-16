@@ -692,28 +692,29 @@ def draw_librarian():
     x2 = 300
     y2 = 300
     color=[0.5,0.5,0.5,1]
-    img = bpy.data.images[0]
-    img.gl_load(bgl.GL_NEAREST, bgl.GL_NEAREST)
-    bgl.glBindTexture(bgl.GL_TEXTURE_2D, img.bindcode)
-    bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MIN_FILTER, bgl.GL_NEAREST)
+    if len(bpy.data.images)>0:
+        img = bpy.data.images[0]
+        img.gl_load(bgl.GL_NEAREST, bgl.GL_NEAREST)
+        bgl.glBindTexture(bgl.GL_TEXTURE_2D, img.bindcode)
+        bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MIN_FILTER, bgl.GL_NEAREST)
 
-    bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MAG_FILTER, bgl.GL_NEAREST)
-    bgl.glEnable(bgl.GL_TEXTURE_2D)
-    bgl.glEnable(bgl.GL_BLEND)
-    #bgl.glBlendFunc(bgl.GL_SRC_ALPHA, bgl.GL_ONE_MINUS_SRC_ALPHA)
-    bgl.glColor4f(color[0], color[1], color[2], color[3])
-    bgl.glBegin(bgl.GL_QUADS)
-    bgl.glTexCoord2f(0,0)
-    bgl.glVertex2f(x1,y1)
-    bgl.glTexCoord2f(0,1)
-    bgl.glVertex2f(x1,y2)
-    bgl.glTexCoord2f(1,1)
-    bgl.glVertex2f(x2,y2)
-    bgl.glTexCoord2f(1,0)
-    bgl.glVertex2f(x2,y1)
-    bgl.glEnd()
-    bgl.glDisable(bgl.GL_BLEND)
-    bgl.glDisable(bgl.GL_TEXTURE_2D)
+        bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MAG_FILTER, bgl.GL_NEAREST)
+        bgl.glEnable(bgl.GL_TEXTURE_2D)
+        bgl.glEnable(bgl.GL_BLEND)
+        #bgl.glBlendFunc(bgl.GL_SRC_ALPHA, bgl.GL_ONE_MINUS_SRC_ALPHA)
+        bgl.glColor4f(color[0], color[1], color[2], color[3])
+        bgl.glBegin(bgl.GL_QUADS)
+        bgl.glTexCoord2f(0,0)
+        bgl.glVertex2f(x1,y1)
+        bgl.glTexCoord2f(0,1)
+        bgl.glVertex2f(x1,y2)
+        bgl.glTexCoord2f(1,1)
+        bgl.glVertex2f(x2,y2)
+        bgl.glTexCoord2f(1,0)
+        bgl.glVertex2f(x2,y1)
+        bgl.glEnd()
+        bgl.glDisable(bgl.GL_BLEND)
+        bgl.glDisable(bgl.GL_TEXTURE_2D)
 
 
 
