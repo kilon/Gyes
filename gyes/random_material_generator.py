@@ -331,6 +331,7 @@ class random_material_class:
         
         if context.scene.gui_mode== 'templates' : 
             box = layout.box()
+            box.operator("gyes.open_librarian")
                     
         if context.scene.gui_mode== 'help' :
             box = layout.box()
@@ -634,7 +635,134 @@ class x(bpy.types.Operator):
                 mat.keyframe_delete(data_path = rm.animated_properties[y], frame = framen)
         
         return{'FINISHED'}
-         
+
+'''
+This script resects the camera position into virtual 3d space.
+Dealga McArdle (c) 2011
+
+The program may be distributed under the terms of the GNU General
+Public License. The full terms of GNU GPL2 can be found at: 
+http://www.gnu.org/licenses/gpl-2.0.html
+
+Be sure that you understand the GLP2 terms prior to using this script.
+Nothing between these tripple quote marks should be construed as
+having deminished the full extent of the GPL2 license.
+'''
+
+import bpy
+import bgl
+import blf
+from mathutils.geometry import intersect_line_line
+from mathutils import Vector
+
+'''
+- TODO: complete vanishing point and horizon drawing
+- TODO: correctly deal with impossible guides orientations
+- TODO: implement rudimentary double buffer for 3d openGL drawing
+'''
+
+
+''' defining globals '''
+
+
+
+# colours/transparency of viewport text
+dimension_colour = (1.0, 1.0, 1.0, 1.0)
+explanation_colour = (1.0, 1.0, 1.0, 0.7)
+
+
+''' G L  D R A W I N G '''
+
+
+def draw_librarian():
+    '''accepts 2 coordinates and a colour then draws
+    the line and the handle'''
+
+    
+
+    #set colour to use
+    bgl.glColor4f(0.5,0.5,0.5,1)
+
+    #draw main line and handles
+    #bgl.glBegin(bgl.GL_LINES)
+    bgl.glRecti(5,5,bpy.context.area.width - 165, bpy.context.area.height-30)
+    #bgl.glEnd()
+    print (bpy.context.area.width)
+
+
+
+def DrawStringToViewport(my_string, pos_x, pos_y, size, colour_type):
+    ''' my_string : the text we want to print
+        pos_x, pos_y : coordinates in integer values
+        size : font height.
+        colour_type : used for definining the colour'''
+    my_dpi, font_id = 72, 0 # dirty fast assignment
+    bgl.glColor4f(*colour_type)
+    blf.position(font_id, pos_x, pos_y, 0)
+    blf.size(font_id, size, my_dpi)
+    blf.draw(font_id, my_string)
+
+
+def InitViewportText(self, context):
+    '''used to deligate opengl text printing to the viewport'''
+    this_h = context.region.height
+    this_w = context.region.width
+    dimension_string = "Gyes - RMG (Random Material Generator)"
+    explanation_string = "Press ESC to exit"
+    DrawStringToViewport(dimension_string, 100, bpy.context.area.height-50, 20, dimension_colour)
+    DrawStringToViewport("Material Templates Librarian version 0.01", 100, bpy.context.area.height-70, 20, dimension_colour)
+    
+    DrawStringToViewport(explanation_string, 10, 7, 40, explanation_colour)
+
+
+def InitGLOverlay(self, context):
+    
+
+    # 50% alpha, 2 pixel width line
+    bgl.glEnable(bgl.GL_BLEND)
+    bgl.glColor4f(0.0, 0.0, 0.0, 0.5)
+    bgl.glLineWidth(1.5)
+
+    # start visible drawing
+    draw_librarian()
+    InitViewportText(self, context)
+
+    # restore opengl defaults
+    bgl.glLineWidth(1)
+    bgl.glDisable(bgl.GL_BLEND)
+    bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
+
+
+class open_templates_librarian(bpy.types.Operator):
+    bl_idname = "gyes.open_librarian"
+    bl_label = "Templates Librarian"
+
+    def modal(self, context, event):
+        context.area.tag_redraw()
+
+        
+        if event.type in ('ESC'):
+            context.region.callback_remove(self._handle)
+            return {'CANCELLED'}
+
+        return {'RUNNING_MODAL'}
+
+    def invoke(self, context, event):
+        if context.area.type == 'VIEW_3D':
+            self.cursor_on_handle = 'None'
+            context.window_manager.modal_handler_add(self)
+
+            # Add the region OpenGL drawing callback
+            # draw in view space with 'POST_VIEW' and 'PRE_VIEW'
+            self._handle = context.region.callback_add(InitGLOverlay, (self, context), 'POST_PIXEL')
+            return {'RUNNING_MODAL'}
+        else:
+            self.report({'WARNING'}, "Image View not found, cannot run operator")
+            return {'CANCELLED'}
+
+
+
+
 #registration is necessary for the script to appear in the GUI
 def register():
     bpy.utils.register_class(gyes_panel)
@@ -652,6 +780,8 @@ def register():
     bpy.utils.register_class(restore_history)
     bpy.utils.register_class(animate)
     bpy.utils.register_class(x)
+    bpy.utils.register_class(open_templates_librarian)
+    
 def unregister():
     bpy.utils.unregister_class(gyes_panel)
     bpy.utils.unregister_class(gyes_random_material)
@@ -668,6 +798,7 @@ def unregister():
     bpy.utils.unregister_class(restore_history)
     bpy.utils.unregister_class(animate)
     bpy.utils.unregister_class(x)
+    bpy.utils.unregister_class(open_templates_librarian)
     
 if __name__ == '__main__':
     register()

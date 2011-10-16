@@ -332,15 +332,6 @@ class random_texture_class:
           
         return texture
 
-    #store active material to history
-    def store_to_history(self, texture):
-        scn = bpy.context.scene
-        history_index = scn.texture_history_index
-        self.history[history_index]= {"name" : texture.name} 
-        print("text stored : "+self.history[history_index]["name"])
-        texture.use_fake_user = True
-                 
-        bpy.context.scene.texture_historybak = str(self.history)
     
     # a nice multi label                        
     def multi_label(self, text, ui,text_width):
