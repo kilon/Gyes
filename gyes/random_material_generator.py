@@ -5,6 +5,13 @@ import bpy ,random , copy
 from bpy.props import *
 import textwrap
 
+def h_names(self,contex):
+    h_list=list(rm.rm_history)
+    h_list.sort()
+    names=[]
+    for x in h_list:
+        names=names+[(x,x,x)]
+    return names 
 class random_material_class:
     """ this class contains all fuctions and variables concerning generation of random material """
     
@@ -43,8 +50,12 @@ class random_material_class:
         
         # this is the dictionary that stores history
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
-        self.rm_history={}
+        bpy.types.Scene.history_name = StringProperty(name="History Name", description ="The name of the history used currently")
+        self.rm_history={"slot 01":{1:{}} , "slot 02":{1:{}} , "slot 03":{1:{}} ,"slot 04":{1:{}} ,"slot 05":{1:{}} ,"slot 06":{1:{}} ,
+                         "slot 07":{1:{}} ,"slot 08":{1:{}} , "slot 09":{1:{}} , "slot 10":{1:{}} ,"slot 11":{1:{}} ,"slot 12":{1:{}} }
         self.delete_start_index=1
+        bpy.types.Scene.h_selected = EnumProperty(attr='name', name='Name :', items=h_names)
+        
         
         # the prop that controls the text wrap in help menu
         bpy.types.Scene.text_width = IntProperty(name = "Text Width" , description = "The width above which the text wraps" , default = 20 , max = 180 , min = 1)
@@ -121,7 +132,8 @@ class random_material_class:
         "use_transparent_shadows",
         "use_vertex_color_paint"]
             
-        
+    
+       
     # compute randomisation based on the general or specific percentage chosen
     # if the specific percentage is zero then the general percentage is used
     def compute_percentage(self,min,max,value,percentage):
@@ -142,14 +154,14 @@ class random_material_class:
     
     #deletes from history an index but without leaving empty spaces, everythings is pushed back    
     def delete_from_history(self):
-        
-        length = len(self.rm_history)
+        h_name = bpy.context.scene.h_selected
+        length = len(self.rm_history[h_name])
         index = bpy.context.scene.history_index
         for x in range(index , length):
             if index != length :
-                self.rm_history[x]= self.rm_history[x+1] 
-        del self.rm_history[length]
-        length = len(self.rm_history) 
+                self.rm_history[h_name][x]= self.rm_history[h_name][x+1] 
+        del self.rm_history[h_name][length]
+        length = len(self.rm_history[h_name]) 
         if index <= length:
             self.activate()
             
@@ -217,17 +229,18 @@ class random_material_class:
     def store_to_history(self, mat):
         scn = bpy.context.scene
         history_index = scn.history_index
-        self.rm_history[history_index]= {"name" : mat.name} 
-        print("mat stored : "+self.rm_history[history_index]["name"])
+        h_name = scn.h_selected
+        self.rm_history[h_name][history_index]={"name" : mat.name}
+        print("mat stored : "+self.rm_history[h_name][history_index]["name"]+" in history name : "+h_name+" in index : "+str(history_index))
         mat.use_fake_user = True
                  
         bpy.context.scene.historybak = str(self.rm_history)
         
     # Activate. Make active material the particular history index the user has chosen
     def activate(self, random_assign = False):
-        
+        h_name = bpy.context.scene.h_selected
         for i in bpy.context.selected_objects :
-            if random_assign == False and i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history ) and rm.rm_history[bpy.context.scene.history_index]:                
+            if random_assign == False and i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history[h_name] ) and rm.rm_history[h_name][bpy.context.scene.history_index]:                
                 scn = bpy.context.scene
                 mat = i.active_material
                 index = scn.history_index
@@ -246,10 +259,10 @@ class random_material_class:
               
             if len(i.material_slots) == 0:
                 print("no slot found creating a new one")
-                i.active_material= bpy.data.materials[self.rm_history[index]["name"]]
+                i.active_material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
             else:
                 print("found slot assigning material")
-                i.material_slots[i.active_material_index].material= bpy.data.materials[self.rm_history[index]["name"]]
+                i.material_slots[i.active_material_index].material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
             
                    
     # a nice multi label                        
@@ -264,12 +277,15 @@ class random_material_class:
     def draw_gui(self ,context,panel):
         layout = panel.layout
         row = layout.row()
+        
         row.prop(context.scene , "gui_mode" )
         
         # check which Gui mode the user has selected (Simple is the default one and display the appropriate gui
         
         if context.scene.gui_mode == 'simple' :
+            
             box = layout.box()
+            
             box.prop(context.scene,"rdiffuse_shader", toggle = True)
             box.prop(context.scene,"rdiffuse_color", toggle = True)
             box.prop(context.scene,"rdiffuse_intensity", toggle = True)
@@ -368,9 +384,10 @@ class random_material_class:
             self.multi_label(help_text,box,w) 
                                 
         # Display the History Gui for all modes
-        
+        h_name=bpy.context.scene.h_selected
         layout.label(text="History (RMG + RTG)")
         history_box= layout.box()
+        history_box.prop(context.scene, "h_selected")
         history_box.prop(context.scene, "history_index")
         row = history_box.row()
         row.operator("gyes.first")
@@ -379,7 +396,7 @@ class random_material_class:
         row.operator("gyes.last")
         rm_index = context.scene.history_index
         
-        if rm_index in self.rm_history and self.rm_history[rm_index] :
+        if rm_index in self.rm_history[h_name] and self.rm_history[h_name][rm_index] :
             row = history_box.row()
             a = row.split(percentage = 0.3, align = True)
             a.operator("gyes.activate")
@@ -390,12 +407,12 @@ class random_material_class:
         else:
             history_box.label(text= "Empty Index ! ")
         
-        if context.scene.history_index < len(self.rm_history)+2:
+        if context.scene.history_index < len(self.rm_history[h_name])+2:
             history_box.operator("gyes.store")
         else:
             history_box.label(text= "Not the first Empty Index")
             
-        if rm_index in self.rm_history and self.rm_history[rm_index] :
+        if rm_index in self.rm_history[h_name] and self.rm_history[h_name][rm_index] :
             history_box.operator("gyes.delete")
             row2 = history_box.row()
             row2.operator("gyes.delete_start")
@@ -466,7 +483,8 @@ class history_previous(bpy.types.Operator):
         if context.scene.history_index > 1 :
             context.scene.history_index = context.scene.history_index -1
             rm_index = context.scene.history_index
-            if rm_index in rm.rm_history and rm.rm_history[rm_index]:
+            h_name = bpy.context.scene.h_selected
+            if rm_index in rm.rm_history[h_name] and rm.rm_history[h_name][rm_index]:
                 rm.activate()
         
         return{'FINISHED'}
@@ -482,7 +500,8 @@ class history_next(bpy.types.Operator):
         if context.scene.history_index > 0 :
             context.scene.history_index = context.scene.history_index +1
             rm_index = context.scene.history_index
-            if rm_index in rm.rm_history and rm.rm_history[rm_index]:
+            h_name = bpy.context.scene.h_selected
+            if rm_index in rm.rm_history[h_name] and rm.rm_history[h_name][rm_index]:
                 rm.activate()
         
         return{'FINISHED'}
@@ -496,7 +515,8 @@ class history_last(bpy.types.Operator):
     bl_description = "Move to the last history index and activate it"
     
     def execute(self, context):
-        index = rm.rm_history 
+        h_name= bpy.context.scene.h_selected
+        index = rm.rm_history[h_name] 
         context.scene.history_index = len(index) 
         rm.activate()
         
@@ -511,7 +531,8 @@ class history_activate(bpy.types.Operator):
     
     def execute(self, context):
         rm_index = context.scene.history_index
-        if rm.rm_history[rm_index] != {}:
+        h_name = bpy.context.scene.h_selected
+        if rm.rm_history[h_name][rm_index] != {}:
             rm.activate()
         
         return{'FINISHED'}
@@ -525,7 +546,8 @@ class history_random_activate(bpy.types.Operator):
     
     def execute(self, context):
         rm_index = context.scene.history_index
-        if rm.rm_history[rm_index] != {}:
+        h_name = bpy.context.scene.h_selected
+        if rm.rm_history[h_name][rm_index] != {}:
             rm.activate(random_assign = True)
         
         return{'FINISHED'}
