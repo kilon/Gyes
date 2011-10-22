@@ -23,14 +23,14 @@ bl_info = {
     "name": "Gyes (A Blender MultiTool)",
     "description": "Gyes is a collection of scripts, named <tools> that simplify , automate and extend blender",
     "author": "Kilon",
-    "version": (0,5),
+    "version": (0,0,7),
     "blender": (2, 5, 9),
     "api": 40500,
     "location": "View3D > Left panel ",
     "warning": '', # used for warning icon and text in addons panel
     "wiki_url": "http://blenderartists.org/forum/showthread.php?232704-GYES-(-A-multi-tool-for-Blender)",
     "tracker_url": "https://github.com/kilon/Gyes",
-    "category": "Other"}
+    "category": "System"}
     
 if "bpy" in locals():
     import imp
