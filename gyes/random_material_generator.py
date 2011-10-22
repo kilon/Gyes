@@ -240,12 +240,20 @@ class random_material_class:
     def activate(self, random_assign = False):
         h_name = bpy.context.scene.h_selected
         for i in bpy.context.selected_objects :
-            if random_assign == False and i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history[h_name] ) and rm.rm_history[h_name][bpy.context.scene.history_index]:                
+            
+            if random_assign == False and i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history[h_name] ) and rm.rm_history[h_name][bpy.context.scene.history_index] and rm.rm_history[h_name][bpy.context.scene.history_index]["name"]:                
                 scn = bpy.context.scene
                 mat = i.active_material
                 index = scn.history_index
                 
-            if random_assign == True and i.type == 'MESH' :
+                if len(i.material_slots) == 0:
+                    print("no slot found creating a new one")
+                    i.active_material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
+                else:
+                    print("found slot assigning material")
+                    i.material_slots[i.active_material_index].material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
+                
+            if random_assign == True and i.type == 'MESH' and ( bpy.context.scene.history_index in rm.rm_history[h_name] ) and rm.rm_history[h_name][bpy.context.scene.history_index] and rm.rm_history[h_name][bpy.context.scene.history_index]["name"]:
             
                 index = round(len(self.rm_history) * random.random())
                 
@@ -256,13 +264,14 @@ class random_material_class:
                 mat = i.active_material
                 scn.history_index=index
                 
+                if len(i.material_slots) == 0:
+                    print("no slot found creating a new one")
+                    i.active_material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
+                else:
+                    print("found slot assigning material")
+                    i.material_slots[i.active_material_index].material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
               
-            if len(i.material_slots) == 0:
-                print("no slot found creating a new one")
-                i.active_material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
-            else:
-                print("found slot assigning material")
-                i.material_slots[i.active_material_index].material= bpy.data.materials[self.rm_history[h_name][index]["name"]]
+            
             
                    
     # a nice multi label                        
@@ -669,12 +678,13 @@ class import_materials(bpy.types.Operator):
     def execute(self, context):
         filter = bpy.context.scene.filter
         h_name = bpy.context.scene.h_selected
+        bpy.context.scene.history_index = len(rm.rm_history[h_name])+1
         for mat in bpy.data.materials:
             if filter in mat.name:
-                
-                bpy.context.scene.history_index = len(rm.rm_history[h_name])
-                bpy.ops.gyes.next()
                 rm.store_to_history(mat)
+                bpy.context.scene.history_index = bpy.context.scene.history_index+1
+                    
+                
                 
         
         return{'FINISHED'}
