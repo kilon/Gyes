@@ -50,7 +50,7 @@ class random_material_class:
         
         # this is the dictionary that stores history
         bpy.types.Scene.history_index = IntProperty(name= "History Index" ,description = "The Number of Random Material Assigned to the Active MAterial of the Selected Object from the history" , default = 1, min = 1 )
-        bpy.types.Scene.history_name = StringProperty(name="History Name", description ="The name of the history used currently")
+        bpy.types.Scene.filter = StringProperty(name="Filter", description ="Filter text , only if the text matches even partially with the material name will be stored")
         self.rm_history={"slot 01":{1:{}} , "slot 02":{1:{}} , "slot 03":{1:{}} ,"slot 04":{1:{}} ,"slot 05":{1:{}} ,"slot 06":{1:{}} ,
                          "slot 07":{1:{}} ,"slot 08":{1:{}} , "slot 09":{1:{}} , "slot 10":{1:{}} ,"slot 11":{1:{}} ,"slot 12":{1:{}} }
         self.delete_start_index=1
@@ -422,7 +422,8 @@ class random_material_class:
             history_box.operator("gyes.restore")
         else:
             history_box.label(text="Backup not Found")
-                                     
+        history_box.prop(context.scene,"filter")
+        history_box.operator("gyes.import_materials")                            
 # create the instance class for randomisation   
 rm =random_material_class()
 
@@ -658,6 +659,26 @@ class x(bpy.types.Operator):
         
         return{'FINISHED'}
 
+# Move to the first history index and activate it
+class import_materials(bpy.types.Operator):
+    
+    bl_label = "Import"
+    bl_idname = "gyes.import_materials"
+    bl_description = "Import all materials matching filter in the active history"
+    
+    def execute(self, context):
+        filter = bpy.context.scene.filter
+        h_name = bpy.context.scene.h_selected
+        for mat in bpy.data.materials:
+            if filter in mat.name:
+                
+                bpy.context.scene.history_index = len(rm.rm_history[h_name])
+                bpy.ops.gyes.next()
+                rm.store_to_history(mat)
+                
+        
+        return{'FINISHED'}
+
 '''
 This script resects the camera position into virtual 3d space.
 Dealga McArdle (c) 2011
@@ -831,7 +852,7 @@ def register():
     bpy.utils.register_class(animate)
     bpy.utils.register_class(x)
     bpy.utils.register_class(open_templates_librarian)
-    
+    bpy.utils.register_class(import_materials)
 def unregister():
     bpy.utils.unregister_class(gyes_panel)
     bpy.utils.unregister_class(gyes_random_material)
@@ -849,6 +870,6 @@ def unregister():
     bpy.utils.unregister_class(animate)
     bpy.utils.unregister_class(x)
     bpy.utils.unregister_class(open_templates_librarian)
-    
+    bpy.utils.unregister_class(import_materials)
 if __name__ == '__main__':
     register()
