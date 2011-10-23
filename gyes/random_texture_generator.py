@@ -739,8 +739,14 @@ class random_texture_class:
             b=a.split(percentage = 0.3, align = True)
             b.operator("gyes.x")
             b.operator("gyes.random_activate")                       
-        else:
-            history_box.label(text= "Empty Index ! ")
+        else: 
+            row = history_box.row()
+            a = row.split(percentage = 0.3, align = True)
+            a.label(text= "Empty Index ! ")
+            a.operator("gyes.animate")
+            b=a.split(percentage = 0.3, align = True)
+            b.operator("gyes.x")
+            b.operator("gyes.random_activate")  
         
         if context.scene.history_index < len(rm.rm_history)+2:
             history_box.operator("gyes.store")
