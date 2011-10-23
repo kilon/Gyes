@@ -688,13 +688,13 @@ class random_texture_class:
         if context.scene.rtexture_gui_mode== 'help' :
             box = layout.box()
             help_text=["","Copyright 2011 Kilon  ",
-            "GYES - RGM",    
+            "GYES - RTG",    
             "Random Material  Generator",
             "A tool that generates random materials.",
             "",
             "Simple Mode",
             "--------------------------",
-            "In this mode you can do basic randomisation. Choose parameters you want to randomise by turning them on or off with clicking on them. Hit the random button when you are ready. Each time you hit the button the new random material is stored in a history index",
+            "In this mode you can do basic randomisation. Choose parameters you want to randomise by turning them on or off with clicking on them. Hit the random button when you are ready. Each time you hit the button a new random texture is generated using existing texture or if there is not one it creates a new one",
             "",
             "History",
             "--------------------------",
@@ -711,10 +711,11 @@ class random_texture_class:
             "Del start -> start deletion from here",
             "Del end -> end deletion here",
             "Restore -> restores history from the saved blend file",
-            "",
+            "Filter -> Text that used to filter material selection for import",
+            "Import -> import materials that match the filter even partially and store them one by one in history "
             "Percentage",
             "--------------------------",
-            "Percentage randomisation means that the parameter is randomised inside a range of percentage of the full range of the value. When a specific percentage is zero, the general percentage is used instead for that area. When a specific percentage is not zero then general percentage is ignored and specific percentage is used instead. If you dont want to randomise that area at all, in Simple Mode use the corresponding button to completely disable that area , the percentage slider will also be disable in the percentage mode. Randomisation takes always the current value as starting point so the next randomisation will use the current randomised value. Randomisation is always 50% of the specific percentage bellow the current value and 50% above . If the percentage exceeed minimum and maximum values of the full range, then it will default to minimum and maximum accordingly. "]
+            "Percentage randomisation means that the parameter is randomised inside a range of percentage of the full range of the value. When a specific percentage is zero, the general percentage is used instead for that area. When a specific percentage is not zero then general percentage is ignored and specific percentage is used instead. If you don't want to randomise that parameter at all, in Simple Mode use the corresponding button to completely disable that parameter , the percentage slider will also be disabled in the percentage mode. Randomization takes always the current value as starting point so the next randomization will use the current randomized value. Randomization is always 50% of the specific percentage bellow the current value and 50% above . If the percentage exceeds minimum and maximum values of the full range, then it will default to minimum and maximum accordingly. "]
             w=bpy.context.scene.text_width
             box.prop(context.scene,"text_width", slider =True)
             self.multi_label(help_text,box,w) 
