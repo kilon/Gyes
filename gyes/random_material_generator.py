@@ -414,7 +414,14 @@ class random_material_class:
             b.operator("gyes.x")
             b.operator("gyes.random_activate")                       
         else:
-            history_box.label(text= "Empty Index ! ")
+            
+            row = history_box.row()
+            a = row.split(percentage = 0.3, align = True)
+            a.label(text= "Empty Index ! ")
+            a.operator("gyes.animate")
+            b=a.split(percentage = 0.3, align = True)
+            b.operator("gyes.x")
+            b.operator("gyes.random_activate")  
         
         if context.scene.history_index < len(self.rm_history[h_name])+2:
             history_box.operator("gyes.store")
