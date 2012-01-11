@@ -778,9 +778,7 @@ class gyes_random_texture(bpy.types.Operator):
     
     def execute(self, context):
         for i in context.selected_objects :
-            if i.type == 'MESH' :
-
-                rt.random_texture(i.active_material)
+            rt.random_texture(i.active_material)
 
         return{'FINISHED'}
 
